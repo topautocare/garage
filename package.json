@@ -1,0 +1,13 @@
+{
+  "name": "top-autocare-scripts",
+  "version": "1.0.0",
+  "description": "Database seeding scripts",
+  "main": "make-admin.js",
+  "type": "module",
+  "scripts": {
+    "start": "node make-admin.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.11.1"
+  }
+}
