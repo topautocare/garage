@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>My Appointments - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 100px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        #header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0;
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1001;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+        #header.hidden { transform: translateY(-100%); }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 0 1.5rem;
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .logo-container img { height: 40px; width: auto; margin-right: 0.75rem; }
+        .logo-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .logo-title span { color: var(--primary-gold); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-right: 1.5rem;
+        }
+
+        .book-btn-mini {
+            background: var(--primary-gold);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: none; /* Visible on desktop via media query if desired, or keep hidden */
+            transition: var(--transition);
+        }
+        @media(min-width: 600px) { .book-btn-mini { display: inline-block; } }
+        .book-btn-mini:hover { background: var(--primary-gold-dark); transform: translateY(-1px); }
+
+        .notification-bell {
+            position: relative;
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .notification-bell:hover { background: #f8f9fa; color: var(--primary-gold); }
+        
+        .notification-badge {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: var(--danger);
+            color: #fff;
+            border-radius: 50%;
+            width: 16px; height: 16px;
+            font-size: 0.65rem;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            border: 2px solid #fff;
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: none;
+        }
+        @media(min-width: 769px) { .menu-toggle { display: block; } }
+
+        /* Container & Controls */
+        .container {
+            max-width: 900px;
+            margin: 90px auto 0;
+            padding: 0 20px;
+        }
+
+        .page-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
+        }
+        .page-controls h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+
+        .controls-right { display: flex; gap: 10px; align-items: center; }
+
+        .filter-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .filter-select:focus { border-color: var(--primary-gold); }
+
+        .btn-new {
+            background: var(--text-dark); color: #fff;
+            padding: 10px 20px; border-radius: 8px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: var(--transition);
+        }
+        .btn-new:hover { background: #000; transform: translateY(-2px); }
+
+        /* Appointment Cards */
+        .appointment-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-gold);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .appointment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .service-title { font-size: 1.1rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .card-id { font-size: 0.75rem; color: var(--text-grey); font-family: monospace; }
+
+        .status-badge {
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed, .status-approved { background: #d1e7dd; color: #0f5132; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .card-details {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; color: var(--text-grey); font-size: 0.9rem;
+        }
+        .detail-item { display: flex; align-items: center; gap: 8px; }
+        .detail-item i { color: var(--primary-gold); width: 20px; text-align: center; }
+        .detail-item span { color: var(--text-dark); font-weight: 500; }
+
+        .card-actions {
+            margin-top: 20px; padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+
+        /* Action Buttons within Card */
+        .btn-action {
+            padding: 6px 14px; border-radius: 6px;
+            font-size: 0.8rem; font-weight: 500;
+            border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-view { background: #f8f9fa; color: var(--text-dark); }
+        .btn-view:hover { background: #e9ecef; }
+        .btn-cancel { background: #fff5f5; color: var(--danger); }
+        .btn-cancel:hover { background: #ffe3e3; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 50px 20px;
+            background: var(--white); border-radius: 12px;
+            border: 2px dashed var(--border-color);
+        }
+        .empty-state i { font-size: 3rem; color: var(--primary-gold); margin-bottom: 15px; opacity: 0.5; }
+        .empty-state h3 { color: var(--text-dark); margin-bottom: 10px; }
+        .empty-state p { color: var(--text-grey); margin-bottom: 20px; }
+
+        /* Skeleton Loading */
+        .skeleton {
+            height: 140px; background: #e0e0e0;
+            border-radius: 12px; margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.8; } 100% { opacity: 0.6; } }
+
+        /* Error Box */
+        .error-box {
+            background: #fff3cd; color: #856404; padding: 15px; 
+            border-radius: 8px; border: 1px solid #ffeeba; 
+            font-size: 0.9rem; margin-bottom: 20px; text-align: center;
+        }
+
+        /* Notifications Toast */
+        .message-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 400px; }
+        .message {
+            padding: 12px 15px; border-radius: 8px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); animation: slideDown 0.3s ease;
+        }
+        .message.success { background: #e6f4ea; color: var(--success); border: 1px solid #34a853; }
+        .message.error { background: #fce8e6; color: var(--danger); border: 1px solid #d93025; }
+        .message.info { background: #fffcf0; color: #f9ab00; border: 1px solid #f9ab00; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Sidebar (Desktop) */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0, 0, 0, 0.5); z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        .sidebar {
+            position: fixed; top: 0; right: -300px;
+            width: 280px; height: 100vh;
+            background: var(--white); padding: 25px;
+            transition: right 0.3s ease; z-index: 2001;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+        .sidebar.active { right: 0; }
+
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .close-sidebar { background: #f1f1f1; border: none; color: var(--text-dark); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+
+        .sidebar-menu { list-style: none; flex: 1; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 12px 15px;
+            color: var(--text-grey); text-decoration: none;
+            border-radius: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(212, 175, 55, 0.1); color: var(--primary-gold-dark);
+        }
+        .sidebar-menu i { width: 25px; }
+
+        .signout-btn {
+            background: #ffebee; color: var(--danger); border: none;
+            padding: 12px; border-radius: 8px; width: 100%;
+            font-weight: 600; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+            transition: var(--transition); margin-top: 20px;
+        }
+        .signout-btn:hover { background: var(--danger); color: #fff; }
+
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 30px; border-radius: 50px;
+            z-index: 999; box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .nav-item {
+            text-decoration: none; color: #999;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 0.75rem; transition: var(--transition);
+        }
+        .nav-item i { font-size: 1.3rem; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary-gold); }
+        .nav-item.active i { transform: translateY(-2px); }
+        .nav-item:hover { color: var(--primary-gold-dark); }
+
+        @media(min-width: 769px) { .bottom-nav { display: none; } }
+
+        @media (max-width: 600px) {
+            .page-controls { flex-direction: column; align-items: stretch; }
+            .controls-right { flex-direction: column; width: 100%; }
+            .filter-select, .btn-new { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header id="header">
+        <a href="dashboard.html" class="logo-container">
+            <img src="images/logo.png" alt="Top Autocare" onerror="this.style.display='none'">
+            <h1 class="logo-title">Top<span>Autocare</span></h1>
+        </a>
+        
+        <div class="header-actions">
+            <a href="book-appointment.html" class="book-btn-mini"><i class="fas fa-plus"></i> Book Now</a>
+            <div class="notification-bell" onclick="window.location.href='notifications.html'">
+                <i class="far fa-bell"></i>
+                <span class="notification-badge" style="display: none;">0</span>
+            </div>
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()">
+        <div class="sidebar" onclick="event.stopPropagation()">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Menu</h2>
+                <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="myvehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                <li><a href="book-appointment.html"><i class="fas fa-calendar-plus"></i> Book Service</a></li>
+                <li><a href="appointments.html" class="active"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+            <button class="signout-btn" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <div class="page-controls">
+            <h1>My Appointments</h1>
+            <div class="controls-right">
+                <select id="filterSelect" class="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <a href="book-appointment.html" class="btn-new" id="newAppointmentBtn">
+                    <i class="fas fa-plus"></i> <span class="desktop-only">New Appointment</span>
+                </a>
+            </div>
+        </div>
+        
+        <div id="messageContainer" class="message-container"></div>
+        
+        <div id="appointmentsContainer">
+            <!-- Loading Skeletons -->
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Nav (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="myvehicles.html" class="nav-item">
+            <i class="fas fa-car"></i>
+            <span>Vehicles</span>
+        </a>
+        <a href="book-appointment.html" class="nav-item">
+            <i class="fas fa-calendar-plus"></i>
+            <span>Book</span>
+        </a>
+        <a href="appointments.html" class="nav-item active">
+            <i class="fas fa-calendar-check"></i>
+            <span>Apps</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, where, onSnapshot, updateDoc, doc, serverTimestamp, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            console.log('Types offline');
+        });
+
+        let currentUser = null;
+        let unsubscribeAppointments = null;
+        let vehiclesMap = {};
+
+        const appointmentsContainer = document.getElementById('appointmentsContainer');
+        const messageContainer = document.getElementById('messageContainer');
+        const filterSelect = document.getElementById('filterSelect');
+
+        // Sidebar
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            document.querySelector('.sidebar').classList.toggle('active');
+        };
+
+        // Sign Out
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        function showMessage(msg, type) {
+            messageContainer.innerHTML = `<div class="message ${type}"><i class="fas fa-info-circle"></i> ${msg}</div>`;
+            setTimeout(() => messageContainer.innerHTML = '', 3000);
+        }
+
+        // Load Vehicles Map (for ID -> Name)
+        function loadVehicles() {
+            if (!currentUser) return;
+            const q = query(collection(db, 'vehicles'), where('userId', '==', currentUser.uid));
+            onSnapshot(q, snap => {
+                vehiclesMap = {};
+                snap.forEach(d => vehiclesMap[d.id] = d.data());
+            });
+        }
+
+        function formatDate(rawProps) {
+            // Try to find any valid date property
+            const raw = rawProps.timestamp || rawProps.date;
+            if (!raw) return 'TBD';
+            
+            // Convert Firestore Timestamp OR String
+            let date;
+            if (raw.toDate) {
+                date = raw.toDate();
+            } else {
+                date = new Date(raw); // Handles strings/numbers
+            }
+            
+            if (isNaN(date.getTime())) return 'TBD';
+
+            return date.toLocaleDateString('en-US', {
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+            });
+        }
+
+        function loadAppointments(filter = 'all') {
+            if (!currentUser) return;
+            if (unsubscribeAppointments) unsubscribeAppointments();
+
+            // NUCLEAR FIX: 
+            // 1. Query ONLY by userId (No sorting, no complex filters).
+            // 2. This avoids Index requirements completely.
+            // 3. We filter and sort in Client Side JS.
+            
+            let q = query(
+                collection(db, 'appointments'),
+                where('userId', '==', currentUser.uid)
+            );
+
+            unsubscribeAppointments = onSnapshot(q, (snapshot) => {
+                appointmentsContainer.innerHTML = '';
+
+                if (snapshot.empty) {
+                    appointmentsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="far fa-calendar-times"></i>
+                            <h3>No Appointments</h3>
+                            <p>You have no booked services.</p>
+                            <a href="book-appointment.html" class="btn-new" style="background:var(--primary-gold);">Book Now</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 1. Extract Data
+                let apps = [];
+                snapshot.forEach(docSnap => {
+                    apps.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // 2. Client Side Filter (if needed)
+                if (filter !== 'all') {
+                    apps = apps.filter(a => a.status === filter);
+                }
+
+                // 3. Client Side Sort (Handle both 'date' and 'timestamp' fields)
+                apps.sort((a, b) => {
+                    // Get comparable values, favoring 'timestamp' then 'date'
+                    // Convert to milliseconds
+                    const getMillis = (obj) => {
+                        const val = obj.timestamp || obj.date;
+                        if (!val) return 0;
+                        if (val.toMillis) return val.toMillis(); // Firestore Timestamp
+                        return new Date(val).getTime() || 0; // Date object or String
+                    };
+
+                    return getMillis(b) - getMillis(a); // Descending
+                });
+
+                if (apps.length === 0 && filter !== 'all') {
+                    appointmentsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No ${filter} appointments</h3>
+                        </div>`;
+                    return;
+                }
+
+                // 4. Render
+                apps.forEach(apt => renderCard(apt));
+
+            }, (error) => {
+                console.error("Fatal Firestore Error:", error);
+                appointmentsContainer.innerHTML = 
+                    `<div class="error-box">
+                        Error loading data.<br>
+                        <small>${error.message}</small>
+                    </div>`;
+            });
+        }
+
+        function renderCard(apt) {
+            const vData = vehiclesMap[apt.vehicleId] || { make: apt.vehicleMake || 'Vehicle', model: apt.vehicleModel || '', year: apt.vehicleYear || '' };
+            const statusClass = `status-${apt.status ? apt.status.toLowerCase() : 'pending'}`;
+            
+            let btnHtml = '';
+            if(apt.status === 'pending') {
+                btnHtml = `<button class="btn-action btn-cancel" onclick="event.stopPropagation(); cancelApt('${apt.id}')">Cancel</button>`;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'appointment-card';
+            div.onclick = () => window.location.href = `appointment-details.html?id=${apt.id}`;
+            
+            // Passing the whole object to formatting to safely find date/timestamp
+            const dateStr = formatDate(apt);
+
+            div.innerHTML = `
+                <div class="card-header">
+                    <div>
+                        <div class="service-title">${apt.service || 'Service'}</div>
+                        <div class="card-id">ID: ${apt.id.substr(0,8)}</div>
+                    </div>
+                    <span class="status-badge ${statusClass}">${apt.status}</span>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item"><i class="far fa-calendar"></i> <span>${dateStr}</span></div>
+                    <div class="detail-item"><i class="far fa-clock"></i> <span>${apt.time || 'Flexible'}</span></div>
+                    <div class="detail-item"><i class="fas fa-car"></i> <span>${vData.make} ${vData.model}</span></div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-action btn-view">View Details</button>
+                    ${btnHtml}
+                </div>
+            `;
+            appointmentsContainer.appendChild(div);
+        }
+
+        window.cancelApt = async (id) => {
+            if(!confirm('Cancel appointment?')) return;
+            try {
+                await updateDoc(doc(db, 'appointments', id), {
+                    status: 'cancelled',
+                    updatedAt: serverTimestamp()
+                });
+                showMessage('Appointment cancelled.', 'success');
+            } catch(e) { showMessage('Could not cancel.', 'error'); }
+        };
+
+        // Filter Logic
+        filterSelect.addEventListener('change', (e) => loadAppointments(e.target.value));
+
+        // Notifications Badge
+        function loadBadge() {
+            const q = query(collection(db, 'notifications'), where('userId', '==', currentUser.uid), where('read', '==', false));
+            onSnapshot(q, s => {
+                const b = document.querySelector('.notification-badge');
+                if(b) {
+                    b.textContent = s.size > 9 ? '9+' : s.size;
+                    b.style.display = s.size > 0 ? 'flex' : 'none';
+                }
+            });
+        }
+
+        onAuthStateChanged(auth, user => {
+            if(user) {
+                currentUser = user;
+                loadVehicles();
+                loadAppointments();
+                loadBadge();
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Scroll
+        let lastScroll = 0;
+        const header = document.getElementById('header');
+        const nav = document.querySelector('.bottom-nav');
+        window.addEventListener('scroll', () => {
+            let current = window.pageYOffset;
+            if (current > lastScroll && current > 100) {
+                header.classList.add('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(100px)';
+            } else {
+                header.classList.remove('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(0)';
+            }
+            lastScroll = current <= 0 ? 0 : current;
+        });
+
+    </script>
+    
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

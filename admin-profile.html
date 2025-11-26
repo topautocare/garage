@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Profile - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+
+        /* ---- PROFILE PAGE SPECIFIC ---- */
+        .page-container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .page-header { margin-bottom: 30px; }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Grid Layout */
+        .profile-grid {
+            display: grid; grid-template-columns: 350px 1fr; gap: 30px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--white); border-radius: 12px; 
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            overflow: hidden; margin-bottom: 30px;
+        }
+
+        /* Left Column - User Card */
+        .user-card-header {
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            height: 100px; position: relative;
+        }
+        .user-avatar-wrapper {
+            position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--white); padding: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .user-avatar {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+            background: #eee; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: #ccc; border: 2px solid var(--primary-gold);
+        }
+        
+        .user-card-body { padding: 60px 20px 30px; text-align: center; }
+        .user-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+        .user-role { 
+            display: inline-block; padding: 4px 12px; background: rgba(212, 175, 55, 0.1); 
+            color: var(--primary-gold-dark); border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+        }
+        
+        .user-info-list { margin-top: 25px; text-align: left; border-top: 1px solid var(--border-color); padding-top: 20px; }
+        .info-item { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.9rem; }
+        .info-label { color: var(--text-grey); }
+        .info-val { font-weight: 500; color: var(--text-dark); }
+
+        /* Right Column - Forms */
+        .card-header {
+            padding: 20px; border-bottom: 1px solid var(--border-color);
+            font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;
+        }
+        .card-body { padding: 25px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-dark); font-weight: 500; }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: inherit; font-size: 0.95rem; transition: var(--transition);
+        }
+        .form-control:focus { border-color: var(--primary-gold); outline: none; }
+        .form-control:disabled { background: #f8f9fa; cursor: not-allowed; }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); transform: translateY(-2px); }
+        
+        .btn-gold {
+            background: var(--primary-gold); color: #fff; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+        }
+        .btn-gold:hover { background: var(--primary-gold-dark); }
+        
+        .btn-secondary { background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: #e2e6ea; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 2000; }
+        .toast {
+            padding: 15px 20px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @media (max-width: 992px) {
+            .profile-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html" class="active"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-gold" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div style="font-weight: 600; color: var(--text-dark);">Admin Panel</div>
+        </header>
+
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Account Settings</h1>
+                    <p>Manage your profile information and security settings.</p>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                
+                <!-- Left Column: Profile Summary -->
+                <div class="profile-sidebar">
+                    <div class="card">
+                        <div class="user-card-header">
+                            <div class="user-avatar-wrapper">
+                                <div class="user-avatar" id="avatarDisplay">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-card-body">
+                            <h3 class="user-name" id="displayCardName">Loading...</h3>
+                            <span class="user-role">Administrator</span>
+
+                            <div class="user-info-list">
+                                <div class="info-item">
+                                    <span class="info-label">Email</span>
+                                    <span class="info-val" id="displayCardEmail">...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Phone</span>
+                                    <span class="info-val" id="displayCardPhone">...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Joined</span>
+                                    <span class="info-val" id="displayCardJoined">...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Status</span>
+                                    <span class="info-val" style="color: var(--success)">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Edit Forms -->
+                <div class="profile-content">
+                    
+                    <!-- General Info -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-user-edit" style="color: var(--primary-gold);"></i> Profile Details
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" id="fullNameInput" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" id="emailInput" class="form-control" disabled style="background: #f8f9fa;">
+                                    <small style="color: var(--text-grey);">Email cannot be changed directly.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" id="phoneInput" class="form-control">
+                                </div>
+                                <div style="text-align: right;">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Security -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-lock" style="color: var(--primary-gold);"></i> Security
+                        </div>
+                        <div class="card-body">
+                            <form id="securityForm">
+                                <div class="form-group">
+                                    <label class="form-label">Current Password</label>
+                                    <input type="password" id="currentPass" class="form-control" required placeholder="Required for authorization">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div class="form-group">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" id="newPass" class="form-control" required minlength="6">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Confirm Password</label>
+                                        <input type="password" id="confirmPass" class="form-control" required minlength="6">
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, onAuthStateChanged, signOut, updateProfile, 
+            reauthenticateWithCredential, EmailAuthProvider, updatePassword 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, doc, getDoc, updateDoc, enableIndexedDbPersistence
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let currentUser = null;
+
+        // Auth Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadProfileData(user.uid);
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Load Data
+        async function loadProfileData(uid) {
+            try {
+                const docRef = doc(db, 'users', uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Populate Inputs
+                    document.getElementById('fullNameInput').value = data.fullName || data.displayName || '';
+                    document.getElementById('emailInput').value = data.email || currentUser.email;
+                    document.getElementById('phoneInput').value = data.phone || data.phoneNumber || '';
+
+                    // Populate Card
+                    document.getElementById('displayCardName').innerText = data.fullName || data.displayName || 'Admin';
+                    document.getElementById('displayCardEmail').innerText = data.email || currentUser.email;
+                    document.getElementById('displayCardPhone').innerText = data.phone || data.phoneNumber || 'Not Set';
+                    
+                    if (data.createdAt) {
+                        const date = (data.createdAt.toDate && typeof data.createdAt.toDate === 'function') 
+                                    ? data.createdAt.toDate() 
+                                    : new Date(data.createdAt);
+                        document.getElementById('displayCardJoined').innerText = date.toLocaleDateString();
+                    }
+
+                    // Update Avatar
+                    if (data.photoURL) {
+                        document.getElementById('avatarDisplay').innerHTML = `<img src="${data.photoURL}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading profile:", error);
+                showToast('Failed to load profile data', 'error');
+            }
+        }
+
+        // Update Profile Details
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('fullNameInput').value;
+            const phone = document.getElementById('phoneInput').value;
+            const btn = e.target.querySelector('button');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                // Update Auth Profile
+                await updateProfile(currentUser, { displayName: name });
+
+                // Update Firestore
+                const docRef = doc(db, 'users', currentUser.uid);
+                await updateDoc(docRef, {
+                    fullName: name,
+                    displayName: name, // Keeping both for compatibility
+                    phone: phone,
+                    phoneNumber: phone
+                });
+
+                // Refresh UI
+                document.getElementById('displayCardName').innerText = name;
+                document.getElementById('displayCardPhone').innerText = phone || 'Not Set';
+                
+                showToast('Profile updated successfully!', 'success');
+            } catch (error) {
+                console.error(error);
+                showToast('Error updating profile.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Save Changes';
+            }
+        });
+
+        // Update Password
+        document.getElementById('securityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPass = document.getElementById('currentPass').value;
+            const newPass = document.getElementById('newPass').value;
+            const confirmPass = document.getElementById('confirmPass').value;
+            const btn = e.target.querySelector('button');
+
+            if (newPass.length < 6) {
+                showToast('Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showToast('New passwords do not match.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            try {
+                // Re-authenticate
+                const credential = EmailAuthProvider.credential(currentUser.email, currentPass);
+                await reauthenticateWithCredential(currentUser, credential);
+
+                // Update
+                await updatePassword(currentUser, newPass);
+                
+                e.target.reset();
+                showToast('Password changed successfully!', 'success');
+            } catch (error) {
+                console.error(error);
+                if(error.code === 'auth/wrong-password') {
+                    showToast('Incorrect current password.', 'error');
+                } else {
+                    showToast('Failed to update password. Try again.', 'error');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Update Password';
+            }
+        });
+
+        // Sign Out
+        window.signOut = async () => {
+            if(confirm('Sign out of Admin Panel?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        // Toast Helper
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Sidebar Toggle
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+    </script>
+    
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

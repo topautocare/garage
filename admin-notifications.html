@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Notifications - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+        
+        .btn-logout { 
+            width: 100%; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; 
+            border: none; padding: 10px; border-radius: 6px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .btn-logout:hover { background: #dc3545; color: #fff; }
+        
+        .btn-gold {
+            background: var(--primary-gold); color: #fff; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+        }
+        .btn-gold:hover { background: var(--primary-gold-dark); }
+
+        /* ---- NOTIFICATIONS SPECIFIC ---- */
+        .page-container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
+        }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Filter Tabs */
+        .filter-bar {
+            display: flex; gap: 10px; background: var(--white); padding: 10px;
+            border-radius: 12px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm); overflow-x: auto; margin-bottom: 25px;
+        }
+        .filter-tab {
+            padding: 8px 16px; border: none; background: transparent;
+            color: var(--text-grey); cursor: pointer; font-weight: 500;
+            border-radius: 6px; white-space: nowrap; transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        .filter-tab:hover { background: rgba(0,0,0,0.03); color: var(--text-dark); }
+        .filter-tab.active { background: var(--primary-gold); color: #fff; }
+
+        /* Action Buttons */
+        .header-actions { display: flex; gap: 10px; }
+        .btn {
+            padding: 8px 15px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-secondary { background: var(--white); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { border-color: var(--text-dark); background: #f8f9fa; }
+        .btn-danger { background: rgba(220, 53, 69, 0.1); color: var(--danger); border: 1px solid transparent; }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+
+        /* Notification List */
+        .notification-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .notification-card {
+            background: var(--white); border-radius: 12px; padding: 20px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            display: flex; align-items: flex-start; gap: 15px; transition: var(--transition);
+            position: relative; overflow: hidden; cursor: pointer;
+        }
+        .notification-card.unread { border-left: 4px solid var(--primary-gold); background: #fffdf5; }
+        .notification-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        .notif-icon {
+            width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+        }
+        
+        /* Icon Colors */
+        .icon-new_user { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .icon-new_appointment { background: rgba(23, 162, 184, 0.1); color: var(--info); }
+        .icon-new_vehicle { background: rgba(255, 193, 7, 0.1); color: #d39e00; }
+        .icon-system { background: rgba(108, 117, 125, 0.1); color: var(--text-dark); }
+
+        .notif-content { flex: 1; padding-right: 20px; }
+        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .notif-title { font-weight: 600; color: var(--text-dark); font-size: 1rem; }
+        .notif-time { font-size: 0.8rem; color: var(--text-grey); white-space: nowrap; margin-left: 10px; }
+        .notif-msg { font-size: 0.9rem; color: var(--text-grey); margin-bottom: 10px; line-height: 1.5; }
+
+        .notif-meta { display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-dark); margin-top: 8px; align-items: center; }
+        .notif-meta i { color: var(--primary-gold); margin-right: 5px; }
+
+        .notif-actions { display: flex; gap: 10px; margin-top: 12px; }
+        .action-link {
+            font-size: 0.8rem; font-weight: 600; text-decoration: none;
+            color: var(--primary-gold-dark); padding: 5px 10px; border-radius: 4px;
+            background: rgba(212, 175, 55, 0.1); transition: var(--transition);
+        }
+        .action-link:hover { background: var(--primary-gold); color: #fff; }
+
+        .delete-btn {
+            position: absolute; top: 15px; right: 15px; color: var(--text-grey);
+            cursor: pointer; transition: var(--transition); opacity: 0.4; padding: 5px;
+        }
+        .delete-btn:hover { color: var(--danger); opacity: 1; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--text-grey);
+            background: var(--white); border-radius: 12px; border: 1px solid var(--border-color);
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.3; color: var(--primary-gold); }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 2000; }
+        .toast {
+            padding: 15px 20px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+            .page-header { flex-direction: column; align-items: flex-start; }
+            .header-actions { width: 100%; justify-content: space-between; }
+            .filter-bar { padding-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <!-- Consistent Navigation -->
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html" class="active"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div style="font-weight: 600; color: var(--text-dark);">Admin Panel</div>
+        </header>
+
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>System Notifications</h1>
+                    <p>Real-time updates on booking requests, user registrations, and system alerts.</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="markAllRead()">
+                        <i class="fas fa-check-double"></i> Mark All Read
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <button class="filter-tab active" onclick="filterType(event, 'all')">All</button>
+                <button class="filter-tab" onclick="filterType(event, 'unread')">Unread</button>
+                <button class="filter-tab" onclick="filterType(event, 'new_appointment')">Appointments</button>
+                <button class="filter-tab" onclick="filterType(event, 'new_user')">Users</button>
+                <button class="filter-tab" onclick="filterType(event, 'new_vehicle')">Vehicles</button>
+            </div>
+
+            <!-- List Container -->
+            <div id="notificationsList" class="notification-list">
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading notifications...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, orderBy, limit, onSnapshot, 
+            doc, updateDoc, deleteDoc, writeBatch, doc as docRef, enableIndexedDbPersistence
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let allNotifications = [];
+        let currentFilter = 'all';
+        let unsubscribe = null;
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loadNotifications();
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Load Notifications Realtime
+        function loadNotifications() {
+            if(unsubscribe) unsubscribe();
+
+            const q = query(
+                collection(db, 'notifications'), 
+                orderBy('timestamp', 'desc'), 
+                limit(100)
+            );
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                allNotifications = [];
+                snapshot.forEach(doc => {
+                    allNotifications.push({ id: doc.id, ...doc.data() });
+                });
+                renderNotifications();
+            }, (error) => {
+                console.error("Error loading notifications:", error);
+                document.getElementById('notificationsList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle" style="color: var(--danger)"></i>
+                        <p>Error loading notifications. Please refresh.</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Render List
+        function renderNotifications() {
+            const container = document.getElementById('notificationsList');
+            
+            // Filter logic
+            let filtered = allNotifications;
+            if (currentFilter === 'unread') {
+                filtered = allNotifications.filter(n => !n.read);
+            } else if (currentFilter !== 'all') {
+                filtered = allNotifications.filter(n => n.type === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                const msg = currentFilter === 'all' ? "No notifications found." : "No notifications for this filter.";
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>${msg}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(notif => {
+                const timeAgo = getTimeAgo(notif.timestamp);
+                const iconClass = `icon-${notif.type || 'system'}`;
+                const iconName = getIconName(notif.type);
+                const unreadClass = !notif.read ? 'unread' : '';
+                const relatedId = notif.relatedId || notif.appointmentId || notif.userId || '';
+
+                return `
+                    <div class="notification-card ${unreadClass}" onclick="markOneRead('${notif.id}')">
+                        <div class="notif-icon ${iconClass}">
+                            <i class="${iconName}"></i>
+                        </div>
+                        <div class="notif-content">
+                            <div class="notif-header">
+                                <span class="notif-title">${notif.title || 'Notification'}</span>
+                                <span class="notif-time">${timeAgo}</span>
+                            </div>
+                            <div class="notif-msg">${notif.message || 'No detail provided.'}</div>
+                            
+                            ${(notif.userName || relatedId) ? `
+                                <div class="notif-meta">
+                                    ${notif.userName ? `<span><i class="fas fa-user"></i> ${notif.userName}</span>` : ''}
+                                    ${relatedId ? `<span><i class="fas fa-hashtag"></i> ${formatId(relatedId)}</span>` : ''}
+                                </div>
+                            ` : ''}
+
+                            ${relatedId ? `
+                                <div class="notif-actions">
+                                    <a href="#" onclick="viewRelated('${notif.type}', '${relatedId}'); event.stopPropagation();" class="action-link">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="delete-btn" onclick="deleteNotif('${notif.id}'); event.stopPropagation();" title="Delete">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helpers
+        function getIconName(type) {
+            switch(type) {
+                case 'new_user': return 'fas fa-user-plus';
+                case 'new_appointment': return 'fas fa-calendar-check';
+                case 'new_vehicle': return 'fas fa-car';
+                default: return 'fas fa-info-circle';
+            }
+        }
+
+        function getTimeAgo(timestamp) {
+            if (!timestamp) return '';
+            const date = (timestamp.toDate && typeof timestamp.toDate === 'function') 
+                         ? timestamp.toDate() 
+                         : new Date(timestamp);
+                         
+            const diff = (new Date() - date) / 1000; // seconds
+            
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return Math.floor(diff / 86400) + 'd ago';
+        }
+
+        function formatId(id) {
+            return id.length > 8 ? id.substring(0, 8) + '...' : id;
+        }
+
+        // Global Functions for HTML access
+        window.filterType = (event, type) => {
+            currentFilter = type;
+            document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderNotifications();
+        };
+
+        window.markOneRead = async (id) => {
+            // Update locally first for snappy feel, Firestone listener will confirm
+            const n = allNotifications.find(x => x.id === id);
+            if (n && !n.read) {
+                try {
+                    await updateDoc(doc(db, 'notifications', id), { read: true });
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.markAllRead = async () => {
+            const batch = writeBatch(db);
+            const unread = allNotifications.filter(n => !n.read);
+            
+            if(unread.length === 0) {
+                showToast('All notifications are already read.', 'success');
+                return;
+            }
+
+            // Batch limit is 500, we filter to top 500 just in case
+            unread.slice(0, 490).forEach(n => {
+                batch.update(doc(db, 'notifications', n.id), { read: true });
+            });
+
+            try {
+                await batch.commit();
+                showToast('All marked as read', 'success');
+            } catch(e) {
+                console.error(e);
+                showToast('Error updating status', 'error');
+            }
+        };
+
+        window.deleteNotif = async (id) => {
+            if(!confirm('Delete this notification?')) return;
+            try {
+                await deleteDoc(doc(db, 'notifications', id));
+                showToast('Deleted', 'success');
+            } catch(e) {
+                showToast('Error deleting', 'error');
+            }
+        };
+
+        window.clearAll = async () => {
+            if(allNotifications.length === 0) {
+                showToast('Nothing to clear.', 'success');
+                return;
+            }
+            
+            if(!confirm('Are you sure you want to delete ALL displayed notifications permanently?')) return;
+            
+            const batch = writeBatch(db);
+            // Safety slice for batch limits
+            allNotifications.slice(0, 490).forEach(n => {
+                batch.delete(doc(db, 'notifications', n.id));
+            });
+
+            try {
+                await batch.commit();
+                showToast('Notifications cleared', 'success');
+            } catch(e) {
+                console.error(e);
+                showToast('Error clearing notifications', 'error');
+            }
+        };
+
+        window.viewRelated = (type, id) => {
+            let url = '';
+            if(type === 'new_appointment') url = `admin-appointment-details.html?id=${id}`;
+            else if(type === 'new_user') url = `admin-user-details.html?id=${id}`;
+            else if(type === 'new_vehicle') url = `admin-vehicles.html?id=${id}`; 
+            
+            if(url) window.location.href = url;
+        };
+
+        // UI Helpers
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+    </script>
+    
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

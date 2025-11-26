@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Dashboard - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* Header */
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .admin-info { text-align: right; }
+        .admin-info h4 { font-size: 0.9rem; font-weight: 600; }
+        .admin-info small { color: var(--text-grey); font-size: 0.8rem; }
+        .admin-avatar {
+            width: 40px; height: 40px; background: var(--primary-gold); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700;
+        }
+
+        /* Dashboard Body */
+        .dashboard-container { padding: 30px; max-width: 1600px; margin: 0 auto; width: 100%; }
+        .page-title { margin-bottom: 30px; }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px; margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white); padding: 25px; border-radius: 12px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: flex-start;
+            transition: var(--transition);
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary-gold); }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
+        .stat-info p { color: var(--text-grey); font-size: 0.9rem; font-weight: 500; }
+        .stat-icon {
+            width: 50px; height: 50px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+        .icon-blue { background: rgba(23, 162, 184, 0.1); color: var(--info); }
+        .icon-gold { background: rgba(212, 175, 55, 0.1); color: var(--primary-gold); }
+        .icon-green { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .icon-red { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+
+        /* Content Grid */
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+
+        .card {
+            background: var(--white); border-radius: 12px; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color); overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 25px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-header h3 { font-size: 1.1rem; font-weight: 600; }
+        .btn-sm {
+            padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; text-decoration: none;
+            font-weight: 500; background: var(--bg-light); color: var(--text-dark);
+        }
+        .card-body { padding: 25px; }
+
+        /* Table */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { text-align: left; padding: 12px 15px; font-size: 0.85rem; color: var(--text-grey); font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        td { padding: 15px; font-size: 0.9rem; color: var(--text-dark); border-bottom: 1px solid var(--border-color); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #fafafa; }
+
+        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+        .status-pending { background: rgba(255, 193, 7, 0.15); color: #856404; }
+        .status-approved { background: rgba(40, 167, 69, 0.15); color: var(--success); }
+        .status-completed { background: rgba(23, 162, 184, 0.15); color: var(--info); }
+        .status-cancelled { background: rgba(220, 53, 69, 0.15); color: var(--danger); }
+        .status-rejected { background: #ddd; color: #555; }
+
+        /* Buttons */
+        .btn-gold {
+            background: var(--primary-gold); color: #fff; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+        }
+        .btn-gold:hover { background: var(--primary-gold-dark); }
+
+        /* Quick Actions */
+        .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .action-card {
+            background: var(--bg-light); padding: 15px; border-radius: 10px;
+            text-align: center; cursor: pointer; border: 1px solid transparent; transition: var(--transition);
+            text-decoration: none; color: var(--text-dark);
+        }
+        .action-card:hover { border-color: var(--primary-gold); background: #fff; transform: translateY(-2px); }
+        .action-card i { font-size: 1.5rem; color: var(--primary-gold); margin-bottom: 10px; display: block; }
+        .action-card span { font-size: 0.85rem; font-weight: 500; }
+
+        .loading-state { text-align: center; padding: 20px; color: var(--text-grey); font-style: italic; }
+
+        @media (max-width: 992px) { .content-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay for Mobile -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-gold" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <div class="user-profile">
+                <div class="admin-info">
+                    <h4 id="adminName">Loading...</h4>
+                    <small>Administrator</small>
+                </div>
+                <div class="admin-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Container -->
+        <div class="dashboard-container">
+            <div class="page-title">
+                <h1>Dashboard Overview</h1>
+                <p>Welcome back. Here's what's happening at Top Autocare today.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="totalBookings">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fas fa-calendar-check"></i></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="revenue">KES 0</h3>
+                        <p>Est. Revenue</p>
+                    </div>
+                    <div class="stat-icon icon-gold"><i class="fas fa-coins"></i></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="usersCount">0</h3>
+                        <p>Registered Users</p>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fas fa-users"></i></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="pendingCount">0</h3>
+                        <p>Pending Action</p>
+                    </div>
+                    <div class="stat-icon icon-red"><i class="fas fa-clock"></i></div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                
+                <!-- Recent Appointments -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <a href="admin-appointments.html" class="btn-sm">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="recentTable">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Service</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentTableBody">
+                                    <tr><td colspan="4" class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading recent data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side Panel (Quick Actions & Chart) -->
+                <div class="side-panel" style="display: flex; flex-direction: column; gap: 25px;">
+                    
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions-grid">
+                                <a href="admin-appointments.html" class="action-card">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <span>New Booking</span>
+                                </a>
+                                <a href="admin-services.html" class="action-card">
+                                    <i class="fas fa-wrench"></i>
+                                    <span>Services</span>
+                                </a>
+                                <a href="admin-users.html" class="action-card">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Add User</span>
+                                </a>
+                                <a href="admin-blog.html" class="action-card">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Blog Post</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simple Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Service Distribution</h3>
+                        </div>
+                        <div class="card-body" style="position: relative; height: 250px; display: flex; justify-content: center;">
+                            <canvas id="bookingChart"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, orderBy, limit, getDocs, 
+            doc, getDoc, onSnapshot, where, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let dashboardChart = null;
+        let usersMap = {}; // Cache user names
+
+        // Check Admin & Load Data
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (userSnap.exists() && (userSnap.data().role === 'admin' || userSnap.data().isAdmin)) {
+                    document.getElementById('adminName').innerText = userSnap.data().fullName || userSnap.data().displayName || 'Admin';
+                    initRealtimeListeners();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Realtime Listeners
+        function initRealtimeListeners() {
+            // 1. Appointments Stats & Chart Data
+            const apptCol = collection(db, 'appointments');
+            
+            onSnapshot(apptCol, (snapshot) => {
+                let total = snapshot.size;
+                let pending = 0;
+                let estimatedRev = 0;
+                let serviceCounts = {};
+
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    
+                    // Count Pending
+                    if(d.status === 'pending') pending++;
+                    
+                    // Calculate Revenue (Completed only)
+                    if(d.status === 'completed' || d.status === 'approved') {
+                        const price = parseFloat(d.price || 0);
+                        if(!isNaN(price)) estimatedRev += price;
+                    }
+
+                    // Chart Data Aggregation
+                    const service = d.service || 'Other';
+                    serviceCounts[service] = (serviceCounts[service] || 0) + 1;
+                });
+
+                // Update Stats DOM
+                document.getElementById('totalBookings').innerText = total;
+                document.getElementById('pendingCount').innerText = pending;
+                document.getElementById('revenue').innerText = `KES ${estimatedRev.toLocaleString()}`;
+
+                // Update Chart
+                updateChart(serviceCounts);
+            });
+
+            // 2. Users Count & Cache
+            onSnapshot(collection(db, 'users'), (snapshot) => {
+                document.getElementById('usersCount').innerText = snapshot.size;
+                // Update local cache for table lookups
+                snapshot.forEach(doc => {
+                    usersMap[doc.id] = doc.data().fullName || doc.data().displayName || 'Customer';
+                });
+            });
+
+            // 3. Recent Table (Ordered by Date)
+            const recentQ = query(collection(db, 'appointments'), orderBy('date', 'desc'), limit(5));
+            
+            onSnapshot(recentQ, async (snapshot) => {
+                const tbody = document.getElementById('recentTableBody');
+                
+                if(snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="loading-state">No appointments found.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                for (const doc of snapshot.docs) {
+                    const d = doc.data();
+                    
+                    // Format Date
+                    let dateStr = 'N/A';
+                    if(d.date) {
+                        dateStr = d.date.toDate ? d.date.toDate().toLocaleDateString() : new Date(d.date).toLocaleDateString();
+                    }
+
+                    // Status Badge Class
+                    let statusClass = 'status-pending';
+                    if(d.status === 'approved') statusClass = 'status-approved';
+                    if(d.status === 'completed') statusClass = 'status-completed';
+                    if(d.status === 'cancelled') statusClass = 'status-cancelled';
+                    if(d.status === 'rejected') statusClass = 'status-rejected';
+
+                    // Resolve Name (Try doc first, then cache, then 'Guest')
+                    let clientName = d.userName || usersMap[d.userId] || 'Customer';
+
+                    html += `
+                        <tr style="cursor: pointer;" onclick="window.location.href='admin-appointment-details.html?id=${doc.id}'">
+                            <td>${clientName}</td>
+                            <td>${d.service}</td>
+                            <td>${dateStr}</td>
+                            <td><span class="status-badge ${statusClass}">${d.status || 'Pending'}</span></td>
+                        </tr>
+                    `;
+                }
+                tbody.innerHTML = html;
+            });
+        }
+
+        // Chart.js Update Logic
+        function updateChart(dataObj) {
+            const labels = Object.keys(dataObj);
+            const data = Object.values(dataObj);
+            const ctx = document.getElementById('bookingChart').getContext('2d');
+
+            if (dashboardChart) {
+                dashboardChart.data.labels = labels;
+                dashboardChart.data.datasets[0].data = data;
+                dashboardChart.update();
+            } else {
+                dashboardChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                '#d4af37', // Gold
+                                '#333333', // Dark
+                                '#b8962e', // Dark Gold
+                                '#6c757d', // Grey
+                                '#17a2b8', // Blue
+                                '#28a745'  // Green
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Logout
+        window.logout = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        // Mobile Sidebar
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

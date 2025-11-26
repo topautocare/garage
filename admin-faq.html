@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>FAQ Management - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-logout { 
+            width: 100%; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; 
+            border: none; padding: 10px; border-radius: 6px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .btn-logout:hover { background: #dc3545; color: #fff; }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* ---- HEADER ---- */
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+        .page-headline { font-weight: 600; font-size: 1.1rem; color: var(--text-dark); }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        
+        /* Notification Bell */
+        .notification-wrapper { position: relative; cursor: pointer; transition: transform 0.2s; }
+        .notification-wrapper:hover { transform: scale(1.1); }
+        .notification-wrapper i { font-size: 1.3rem; color: var(--text-grey); transition: color 0.3s; }
+        .notification-wrapper:hover i { color: var(--primary-gold); }
+        
+        .badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--danger); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 2px 5px; border-radius: 50%;
+            min-width: 18px; text-align: center;
+            border: 2px solid var(--white);
+            display: none;
+        }
+
+        /* ---- FAQ PAGE ---- */
+        .page-container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
+        }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Actions Bar */
+        .actions-bar {
+            background: var(--white); padding: 20px; border-radius: 12px;
+            box-shadow: var(--shadow-sm); margin-bottom: 30px; border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+        }
+        .search-box {
+            position: relative; flex: 1; max-width: 400px;
+        }
+        .search-box i {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: var(--text-grey);
+        }
+        .search-input {
+            width: 100%; padding: 12px 15px 12px 40px; border-radius: 8px;
+            border: 1px solid var(--border-color); outline: none; transition: var(--transition);
+        }
+        .search-input:focus { border-color: var(--primary-gold); }
+
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); transform: translateY(-2px); }
+        .btn-secondary { background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-danger { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+
+        /* FAQ List */
+        .faq-grid { display: flex; flex-direction: column; gap: 15px; }
+        
+        .faq-card {
+            background: var(--white); border-radius: 10px; padding: 20px;
+            border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);
+            display: flex; gap: 20px; align-items: flex-start; transition: var(--transition);
+        }
+        .faq-card:hover { transform: translateX(5px); border-left: 4px solid var(--primary-gold); }
+
+        .faq-order {
+            width: 35px; height: 35px; background: var(--bg-light); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--primary-gold); flex-shrink: 0;
+        }
+        .faq-content { flex: 1; }
+        .faq-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; color: var(--text-dark); }
+        .faq-text { color: var(--text-grey); font-size: 0.95rem; line-height: 1.5; margin-bottom: 10px; }
+        
+        .faq-meta { display: flex; gap: 15px; font-size: 0.85rem; align-items: center; }
+        .faq-badge { padding: 4px 10px; border-radius: 15px; font-weight: 500; background: #eee; color: #555; }
+        .faq-badge.active { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .faq-badge.inactive { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+
+        .faq-actions { display: flex; gap: 10px; flex-shrink: 0; }
+        .action-icon {
+            width: 35px; height: 35px; border-radius: 8px; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: var(--transition); border: 1px solid var(--border-color);
+        }
+        .action-icon:hover { background: var(--bg-light); color: var(--primary-gold); }
+        .action-icon.delete:hover { color: var(--danger); border-color: var(--danger); }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fff; margin: 10% auto; padding: 30px;
+            border-radius: 12px; width: 90%; max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative;
+        }
+        .close-modal {
+            position: absolute; top: 20px; right: 20px; font-size: 1.5rem;
+            cursor: pointer; color: var(--text-grey);
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-dark); }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; outline: none;
+        }
+        .form-control:focus { border-color: var(--primary-gold); }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 3000; }
+        .toast {
+            padding: 15px 25px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+            .faq-card { flex-direction: column; gap: 10px; }
+            .faq-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html" class="active"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="page-headline">FAQ Management</div>
+            </div>
+
+            <div class="header-right">
+                <!-- Notification Bell -->
+                <div class="notification-wrapper" onclick="window.location.href='admin-notifications.html'" title="View Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="headerNotifBadge">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Frequently Asked Questions</h1>
+                    <p>Manage the help content displayed to your customers.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('add')">
+                    <i class="fas fa-plus"></i> Add New FAQ
+                </button>
+            </div>
+
+            <div class="actions-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by title or content...">
+                </div>
+                <div style="color: var(--text-grey); font-size: 0.9rem;" id="faqCount">Loading...</div>
+            </div>
+
+            <div id="faqList" class="faq-grid">
+                <div style="text-align: center; padding: 40px; color: var(--text-grey);">
+                    <i class="fas fa-spinner fa-spin"></i> Loading FAQs...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Add FAQ</h2>
+            
+            <form id="faqForm">
+                <div class="form-group">
+                    <label class="form-label">Question / Title</label>
+                    <input type="text" id="faqTitle" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Answer / Content</label>
+                    <textarea id="faqContent" class="form-control" rows="5" required></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="faqCategory" class="form-control">
+                            <option value="General">General</option>
+                            <option value="Services">Services</option>
+                            <option value="Booking">Booking</option>
+                            <option value="Payment">Payment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Order Priority</label>
+                        <input type="number" id="faqOrder" class="form-control" placeholder="e.g. 1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="faqActive" checked style="width: 18px; height: 18px;">
+                        <span style="font-weight: 500;">Active (Visible on site)</span>
+                    </label>
+                </div>
+                
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()" style="margin-right: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save FAQ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, orderBy, onSnapshot, 
+            addDoc, updateDoc, deleteDoc, doc, getDoc, where, serverTimestamp, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let faqs = [];
+        let editId = null;
+        let unsubscribe = null;
+        const notifBadge = document.getElementById('headerNotifBadge');
+
+        // Auth Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Admin Check
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                if(uSnap.exists() && (uSnap.data().role === 'admin' || uSnap.data().isAdmin)) {
+                    listenForNotifications();
+                    initFAQListener();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Notifications Listener (Header)
+        function listenForNotifications() {
+            const q = query(collection(db, 'notifications'), where('read', '==', false));
+            onSnapshot(q, (snap) => {
+                const count = snap.size;
+                if(count > 0) {
+                    notifBadge.style.display = 'block';
+                    notifBadge.innerText = count > 99 ? '99+' : count;
+                } else {
+                    notifBadge.style.display = 'none';
+                }
+            });
+        }
+
+        // FAQ Realtime Listener
+        function initFAQListener() {
+            const q = query(collection(db, 'faq'), orderBy('order', 'asc'));
+            
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                faqs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderFAQs(faqs);
+            }, (error) => {
+                console.error(error);
+                document.getElementById('faqList').innerHTML = `<div style="text-align:center; color:red;">Error loading FAQs.</div>`;
+            });
+        }
+
+        // Render Function
+        function renderFAQs(list) {
+            const container = document.getElementById('faqList');
+            const countEl = document.getElementById('faqCount');
+            
+            countEl.innerText = `${list.length} Records`;
+
+            if(list.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-grey); background: #fff; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No FAQs found. Add one to get started.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = list.map((faq, index) => `
+                <div class="faq-card">
+                    <div class="faq-order">${faq.order || index + 1}</div>
+                    <div class="faq-content">
+                        <div class="faq-title">${faq.title || 'Untitled'}</div>
+                        <div class="faq-text">${faq.content || ''}</div>
+                        <div class="faq-meta">
+                            <span class="faq-badge" style="background: #eef; color: #448;">${faq.category || 'General'}</span>
+                            <span class="faq-badge ${faq.active ? 'active' : 'inactive'}">
+                                ${faq.active ? '<i class="fas fa-check"></i> Active' : '<i class="fas fa-times"></i> Inactive'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="faq-actions">
+                        <div class="action-icon" onclick='editFAQ(${JSON.stringify(faq).replace(/'/g, "&#39;")})' title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="action-icon delete" onclick="deleteFAQ('${faq.id}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = faqs.filter(f => 
+                (f.title && f.title.toLowerCase().includes(term)) || 
+                (f.content && f.content.toLowerCase().includes(term))
+            );
+            renderFAQs(filtered);
+        });
+
+        // Modal Operations
+        window.openModal = (mode) => {
+            const modal = document.getElementById('faqModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('faqForm');
+            
+            if (mode === 'add') {
+                title.innerText = 'Add New FAQ';
+                form.reset();
+                document.getElementById('faqOrder').value = faqs.length + 1;
+                editId = null;
+            }
+            modal.style.display = 'block';
+        };
+
+        window.closeModal = () => {
+            document.getElementById('faqModal').style.display = 'none';
+        };
+
+        window.editFAQ = (faq) => {
+            editId = faq.id;
+            document.getElementById('modalTitle').innerText = 'Edit FAQ';
+            document.getElementById('faqTitle').value = faq.title;
+            document.getElementById('faqContent').value = faq.content;
+            document.getElementById('faqCategory').value = faq.category || 'General';
+            document.getElementById('faqOrder').value = faq.order;
+            document.getElementById('faqActive').checked = faq.active;
+            
+            document.getElementById('faqModal').style.display = 'block';
+        };
+
+        // Form Submit
+        document.getElementById('faqForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = 'Saving...';
+
+            const data = {
+                title: document.getElementById('faqTitle').value,
+                content: document.getElementById('faqContent').value,
+                category: document.getElementById('faqCategory').value,
+                order: Number(document.getElementById('faqOrder').value),
+                active: document.getElementById('faqActive').checked,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, 'faq', editId), data);
+                    showToast('FAQ updated successfully', 'success');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'faq'), data);
+                    showToast('FAQ created successfully', 'success');
+                }
+                closeModal();
+            } catch (err) {
+                console.error(err);
+                showToast('Error saving FAQ', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Save FAQ';
+            }
+        });
+
+        // Delete
+        window.deleteFAQ = async (id) => {
+            if(!confirm('Delete this FAQ permanently?')) return;
+            try {
+                await deleteDoc(doc(db, 'faq', id));
+                showToast('FAQ deleted', 'success');
+            } catch (e) {
+                showToast('Error deleting', 'error');
+            }
+        };
+
+        // Helper: Toast
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast`;
+            t.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
+            if(type === 'error') t.style.borderLeftColor = 'var(--danger)';
+            else if(type === 'success') t.style.borderLeftColor = 'var(--success)';
+            
+            container.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        // UI Helpers
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                if(unsubscribe) unsubscribe();
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        // Close modal on outside click
+        window.onclick = (event) => {
+            const modal = document.getElementById('faqModal');
+            if (event.target == modal) closeModal();
+        };
+    </script>
+    
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

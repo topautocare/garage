@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Terms of Service - Top Autocare</title>
+    <meta name="description" content="Terms of Service for Top Autocare Garage. Review our rules for using the website and booking appointments.">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 100px; /* Space for bottom nav */
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        #header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0;
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1001;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+        #header.hidden { transform: translateY(-100%); }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 0 1.5rem;
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .logo-container img { height: 40px; width: auto; margin-right: 0.75rem; }
+        .logo-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .logo-title span { color: var(--primary-gold); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-right: 1.5rem;
+        }
+
+        .back-btn {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.0rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: none;
+        }
+
+        @media(min-width: 769px) { .menu-toggle { display: block; } }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 90px auto 0;
+            padding: 0 20px;
+        }
+
+        .terms-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .terms-header h1 { font-size: 2rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+        .updated-date { background: #fff3cd; color: #856404; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
+
+        .terms-section { margin-bottom: 30px; }
+        .terms-section h2 { 
+            color: var(--primary-gold-dark); 
+            font-size: 1.3rem; 
+            margin-bottom: 15px; 
+            display: flex; align-items: center; gap: 10px;
+        }
+        .terms-section p { margin-bottom: 15px; color: #444; font-size: 0.95rem; text-align: justify;}
+        .terms-section ul { padding-left: 20px; margin-bottom: 15px; }
+        .terms-section li { margin-bottom: 8px; color: #444; font-size: 0.95rem; }
+        .terms-section a { color: var(--primary-gold-dark); text-decoration: none; font-weight: 500; }
+
+        .important-box {
+            background: rgba(220, 53, 69, 0.05);
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .important-box strong { color: var(--danger); }
+
+        /* Sidebar (Desktop) */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0, 0, 0, 0.5); z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        .sidebar {
+            position: fixed; top: 0; right: -300px;
+            width: 280px; height: 100vh;
+            background: var(--white); padding: 25px;
+            transition: right 0.3s ease; z-index: 2001;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+        .sidebar.active { right: 0; }
+
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .close-sidebar { background: #f1f1f1; border: none; color: var(--text-dark); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+
+        .sidebar-menu { list-style: none; flex: 1; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 12px 15px;
+            color: var(--text-grey); text-decoration: none;
+            border-radius: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .sidebar-menu a:hover { background: rgba(212, 175, 55, 0.1); color: var(--primary-gold-dark); }
+        .sidebar-menu i { width: 25px; }
+
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 30px; border-radius: 50px;
+            z-index: 999; box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .nav-item {
+            text-decoration: none; color: #999;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 0.75rem; transition: var(--transition);
+        }
+        .nav-item i { font-size: 1.3rem; transition: transform 0.2s; }
+        .nav-item:hover { color: var(--primary-gold-dark); }
+
+        @media(min-width: 769px) { .bottom-nav { display: none; } }
+
+        /* Offline Badge */
+        .offline-badge {
+            position: fixed; bottom: 90px; right: 20px;
+            background: var(--danger); color: #fff; padding: 8px 16px;
+            border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000;
+            display: none; align-items: center; gap: 6px;
+        }
+        .offline-badge.show { display: flex; animation: fadeIn 0.3s; }
+        @media(min-width: 769px) { .offline-badge { bottom: 30px; } }
+
+        /* Footer */
+        footer { text-align: center; color: var(--text-grey); font-size: 0.85rem; padding: 20px; }
+        footer a { color: var(--text-dark); text-decoration: none; }
+        
+        @media (max-width: 768px) {
+            .terms-card { padding: 25px; }
+            .terms-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header id="header">
+        <a href="dashboard.html" class="logo-container">
+            <img src="images/logo.png" alt="Top Autocare" onerror="this.style.display='none'">
+            <h1 class="logo-title">Top<span>Autocare</span></h1>
+        </a>
+        
+        <div class="header-actions">
+            <a href="javascript:history.back()" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()">
+        <div class="sidebar" onclick="event.stopPropagation()">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Menu</h2>
+                <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="myvehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                <li><a href="book-appointment.html"><i class="fas fa-calendar-plus"></i> Book Service</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+            <div style="margin-top: auto; text-align: center; font-size: 0.8rem; color: #999; padding-top: 20px;">
+                &copy; 2025 Top Autocare
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="terms-card">
+            <div class="terms-header">
+                <h1>Terms of Service</h1>
+                <span class="updated-date">Last Updated: November 2025</span>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-handshake"></i> 1. Introduction</h2>
+                <p>Welcome to Top Autocare Garage. These Terms of Service govern your use of our website, online booking system, and automotive services provided in Nairobi, Kenya. By accessing our platform or booking a service, you agree to be bound by these terms.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-wrench"></i> 2. Description of Services</h2>
+                <p>We provide automotive repair, maintenance, and online booking services. Key features include:</p>
+                <ul>
+                    <li>Online appointment scheduling for routine maintenance and repairs.</li>
+                    <li>Vehicle history tracking and management.</li>
+                    <li>General automotive diagnostics and consultation.</li>
+                </ul>
+                <p>We reserve the right to refuse service or cancel appointments based on availability or operational capacity.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-user-shield"></i> 3. User Accounts</h2>
+                <p>To book services, accurate information is required. You are responsible for maintaining the confidentiality of your account credentials.</p>
+                <ul>
+                    <li>You must provide a valid email and phone number.</li>
+                    <li>Do not share your account access with unauthorized individuals.</li>
+                    <li>Notify us immediately of any security breaches.</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-calendar-check"></i> 4. Bookings & Cancellations</h2>
+                <p>Appointments booked online are requests until confirmed by our team via email or SMS.</p>
+                <ul>
+                    <li><strong>Cancellation:</strong> Free cancellation up to 24 hours before the scheduled time.</li>
+                    <li><strong>No-Shows:</strong> Repeated no-shows may result in restricted booking privileges.</li>
+                    <li><strong>Delays:</strong> We aim to adhere to specific times, but workshop dynamics may cause slight delays.</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-tools"></i> 5. Service & Warranty</h2>
+                <p>We strive for excellence in every repair. Specific warranties on parts depend on the manufacturer.</p>
+                <div class="important-box">
+                    <strong>Liability Disclaimer:</strong> While we take utmost care, Top Autocare is not liable for pre-existing vehicle conditions or issues unrelated to the specific service performed. Valuable items should be removed from the vehicle before service.
+                </div>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-gavel"></i> 6. Governing Law</h2>
+                <p>These terms are governed by the laws of Kenya. Any disputes arising from these terms shall be resolved in the courts of Nairobi.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2><i class="fas fa-envelope"></i> 7. Contact Us</h2>
+                <p>If you have questions regarding these terms, please contact us at:</p>
+                <p>
+                    <strong>Email:</strong> <a href="mailto:info@topautocare.com">info@topautocare.com</a><br>
+                    <strong>Address:</strong> Industrial Area, Nairobi, Kenya
+                </p>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2024 Top Autocare Garage. <a href="privacy.html">Privacy Policy</a>
+        </footer>
+    </div>
+
+    <!-- Bottom Nav (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="myvehicles.html" class="nav-item">
+            <i class="fas fa-car"></i>
+            <span>Vehicles</span>
+        </a>
+        <a href="book-appointment.html" class="nav-item">
+            <i class="fas fa-calendar-plus"></i>
+            <span>Book</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
+
+    <!-- Offline Badge -->
+    <div id="offlineBadge" class="offline-badge">
+        <i class="fas fa-wifi-slash"></i> You are offline
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Sidebar Toggle
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            document.querySelector('.sidebar').classList.toggle('active');
+        };
+
+        // Offline Status
+        window.addEventListener('offline', () => document.getElementById('offlineBadge').classList.add('show'));
+        window.addEventListener('online', () => document.getElementById('offlineBadge').classList.remove('show'));
+
+        // Header Scroll
+        let lastScroll = 0;
+        const header = document.getElementById('header');
+        const nav = document.querySelector('.bottom-nav');
+        window.addEventListener('scroll', () => {
+            let current = window.pageYOffset;
+            if (current > lastScroll && current > 100) {
+                header.classList.add('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(100px)';
+            } else {
+                header.classList.remove('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(0)';
+            }
+            lastScroll = current <= 0 ? 0 : current;
+        });
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+    <script src="analytics.js"></script>
+    <script src="service-worker-manager.js"></script>
+</body>
+</html>

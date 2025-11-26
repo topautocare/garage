@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>System Settings - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+
+        /* ---- SETTINGS SPECIFIC ---- */
+        .page-container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
+        }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Grid & Cards */
+        .settings-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+        .card {
+            background: var(--white); border-radius: 12px; padding: 25px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        .card-header {
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-header h3 { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        
+        /* Forms */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group.full-width { grid-column: span 2; }
+
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-dark); }
+        .form-control {
+            width: 100%; padding: 10px 15px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: inherit; font-size: 0.9rem; transition: var(--transition);
+        }
+        .form-control:focus { border-color: var(--primary-gold); outline: none; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* Preview Card */
+        .preview-card {
+            background: #1a1a1a; color: #fff; border-radius: 12px; padding: 20px;
+            box-shadow: var(--shadow-md);
+        }
+        .preview-title { font-size: 0.9rem; color: var(--primary-gold); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .preview-item { margin-bottom: 12px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
+        .preview-item i { width: 20px; color: var(--primary-gold); text-align: center; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); transform: translateY(-2px); }
+        .btn-secondary { background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { border-color: var(--text-dark); }
+        .btn-danger { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 2000; }
+        .toast {
+            padding: 15px 20px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @media (max-width: 992px) {
+            .settings-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div style="font-weight: 600; color: var(--text-dark);">Admin Panel</div>
+        </header>
+
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>System Settings</h1>
+                    <p>Configure business details and global notifications.</p>
+                </div>
+                <button class="btn btn-secondary" onclick="loadSettings()">
+                    <i class="fas fa-sync-alt"></i> Reload
+                </button>
+            </div>
+
+            <div class="settings-grid">
+                
+                <!-- Left: Main Settings -->
+                <div class="settings-main">
+                    
+                    <!-- Business Info -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-building" style="color: var(--primary-gold)"></i> Business Information</h3>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Business Name</label>
+                                <input type="text" class="form-control" id="bizName" placeholder="Top Autocare Garage">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" id="bizEmail" placeholder="info@topautocare.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="bizPhone" placeholder="+254 700 000000">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">WhatsApp Number</label>
+                                <input type="tel" class="form-control" id="bizWhatsapp" placeholder="+254 700 000000">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control" id="bizAddress" placeholder="Industrial Area, Nairobi">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Business Hours</label>
+                                <textarea class="form-control" id="bizHours" rows="3" placeholder="Mon-Fri: 8am - 6pm..."></textarea>
+                            </div>
+                        </div>
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="saveSettings()">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Broadcast -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bullhorn" style="color: var(--primary-gold)"></i> Broadcast Announcement</h3>
+                        </div>
+                        <p style="color: var(--text-grey); font-size: 0.9rem; margin-bottom: 15px;">
+                            Send a notification to <strong>ALL</strong> registered users. Use this for promotions or important updates.
+                        </p>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" id="broadcastMsg" rows="3" placeholder="Enter announcement message..."></textarea>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn btn-danger" onclick="sendBroadcast()">
+                                <i class="fas fa-paper-plane"></i> Send to All Users
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Preview & Socials -->
+                <div class="settings-sidebar">
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-eye" style="color: var(--primary-gold)"></i> Live Preview</h3>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-title">Contact Info</div>
+                            <div class="preview-item">
+                                <i class="fas fa-phone"></i> <span id="prevPhone">...</span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-envelope"></i> <span id="prevEmail">...</span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fab fa-whatsapp"></i> <span id="prevWhatsapp">...</span>
+                            </div>
+                            <div class="preview-item" style="align-items: flex-start;">
+                                <i class="fas fa-map-marker-alt" style="margin-top: 3px;"></i> <span id="prevAddress">...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-share-alt" style="color: var(--primary-gold)"></i> Social Media</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Twitter Handle</label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 10px; top: 10px; color: #aaa;">@</span>
+                                <input type="text" class="form-control" id="socialTwitter" style="padding-left: 30px;" placeholder="username">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Instagram Handle</label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 10px; top: 10px; color: #aaa;">@</span>
+                                <input type="text" class="form-control" id="socialInsta" style="padding-left: 30px;" placeholder="username">
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn btn-secondary" onclick="saveSettings()">Update Links</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, doc, getDoc, setDoc, collection, getDocs, writeBatch, serverTimestamp, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let currentUser = null;
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // Verify Admin
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                const userData = uSnap.data();
+                if (uSnap.exists() && (userData.role === 'admin' || userData.isAdmin)) {
+                    loadSettings();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Load Settings
+        window.loadSettings = async () => {
+            try {
+                const snap = await getDoc(doc(db, 'settings', 'global'));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    document.getElementById('bizName').value = data.businessName || '';
+                    document.getElementById('bizEmail').value = data.businessEmail || '';
+                    document.getElementById('bizPhone').value = data.businessPhone || '';
+                    document.getElementById('bizWhatsapp').value = data.whatsapp || '';
+                    document.getElementById('bizAddress').value = data.address || '';
+                    document.getElementById('bizHours').value = data.hours || '';
+                    document.getElementById('socialTwitter').value = data.twitter || '';
+                    document.getElementById('socialInsta').value = data.instagram || '';
+                    
+                    updatePreview();
+                    showToast('Settings loaded', 'success');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Failed to load settings', 'error');
+            }
+        };
+
+        // Save Settings
+        window.saveSettings = async () => {
+            const data = {
+                businessName: document.getElementById('bizName').value.trim(),
+                businessEmail: document.getElementById('bizEmail').value.trim(),
+                businessPhone: document.getElementById('bizPhone').value.trim(),
+                whatsapp: document.getElementById('bizWhatsapp').value.trim(),
+                address: document.getElementById('bizAddress').value.trim(),
+                hours: document.getElementById('bizHours').value.trim(),
+                twitter: document.getElementById('socialTwitter').value.trim(),
+                instagram: document.getElementById('socialInsta').value.trim(),
+                updatedAt: serverTimestamp(),
+                updatedBy: currentUser.uid
+            };
+
+            try {
+                await setDoc(doc(db, 'settings', 'global'), data, { merge: true });
+                updatePreview();
+                showToast('Settings saved successfully', 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Error saving settings', 'error');
+            }
+        };
+
+        // Broadcast Notification
+        window.sendBroadcast = async () => {
+            const msg = document.getElementById('broadcastMsg').value.trim();
+            if (msg.length < 5) return showToast('Message too short', 'error');
+
+            if (!confirm('Send this to ALL users? This cannot be undone.')) return;
+
+            const btn = document.querySelector('.btn-danger');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            try {
+                // 1. Get all users
+                const usersSnap = await getDocs(collection(db, 'users'));
+                if (usersSnap.empty) throw new Error('No users found');
+
+                // 2. Batch Write (limit 500 per batch)
+                let batch = writeBatch(db);
+                let count = 0;
+
+                usersSnap.forEach(userDoc => {
+                    const ref = doc(collection(db, 'notifications'));
+                    batch.set(ref, {
+                        userId: userDoc.id,
+                        type: 'system',
+                        title: 'Announcement',
+                        message: msg,
+                        read: false,
+                        timestamp: serverTimestamp()
+                    });
+                    count++;
+                    
+                    // Firestore batch limit
+                    if (count >= 450) {
+                        batch.commit();
+                        batch = writeBatch(db);
+                        count = 0;
+                    }
+                });
+
+                if (count > 0) await batch.commit();
+
+                document.getElementById('broadcastMsg').value = '';
+                showToast(`Sent to ${usersSnap.size} users`, 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Failed to send broadcast', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to All Users';
+            }
+        };
+
+        // Live Preview Updater
+        function updatePreview() {
+            document.getElementById('prevPhone').innerText = document.getElementById('bizPhone').value || 'Not Set';
+            document.getElementById('prevEmail').innerText = document.getElementById('bizEmail').value || 'Not Set';
+            document.getElementById('prevWhatsapp').innerText = document.getElementById('bizWhatsapp').value || 'Not Set';
+            document.getElementById('prevAddress').innerText = document.getElementById('bizAddress').value || 'Not Set';
+        }
+
+        // Real-time Input Listeners
+        ['bizPhone', 'bizEmail', 'bizWhatsapp', 'bizAddress'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePreview);
+        });
+
+        // Toast
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Sidebar
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+    </script>
+    
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper Functions
+    function isAdmin() {
+      return request.auth != null && 
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 1. Blog Images
+    // Anyone can view. Only Admins can upload/delete.
+    match /blogs/{fileName} {
+      allow read: if true;
+      allow write, delete: if isAdmin();
+    }
+
+    // 2. User Avatars (Future proofing)
+    // Anyone can view. Only the owner can upload.
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 3. Default Deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

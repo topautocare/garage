@@ -1,0 +1,38 @@
+{
+  "name": "top-autocare-pwa",
+  "version": "1.0.0",
+  "description": "Premium automotive garage services PWA with online booking and vehicle management.",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "start": "serve .",
+    "dev": "serve . -p 3000",
+    "deploy": "firebase deploy",
+    "format": "prettier --write \"**/*.{html,js,css,json}\""
+  },
+  "keywords": [
+    "pwa",
+    "automotive",
+    "garage",
+    "firebase",
+    "booking-system"
+  ],
+  "author": "Top Autocare",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0",
+    "prettier": "^3.2.4",
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

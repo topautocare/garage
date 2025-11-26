@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Our Services - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --success: #28a745;
+            --danger: #dc3545;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 100px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        #header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0;
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1001;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+        #header.hidden { transform: translateY(-100%); }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 0 1.5rem;
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .logo-container img { height: 40px; width: auto; margin-right: 0.75rem; }
+        .logo-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .logo-title span { color: var(--primary-gold); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-right: 1.5rem;
+        }
+
+        .notification-bell {
+            position: relative;
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .notification-bell:hover { background: #f8f9fa; color: var(--primary-gold); }
+        
+        .notification-badge {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: var(--danger);
+            color: #fff;
+            border-radius: 50%;
+            width: 16px; height: 16px;
+            font-size: 0.65rem;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            border: 2px solid #fff;
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: none;
+        }
+        @media(min-width: 769px) { .menu-toggle { display: block; } }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 90px auto 0;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 2rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+        .page-header p { color: var(--text-grey); max-width: 600px; margin: 0 auto; }
+
+        /* Service Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Service Card */
+        .service-card {
+            background: var(--white);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-gold);
+        }
+
+        .service-icon {
+            width: 60px; height: 60px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary-gold);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .service-card:hover .service-icon { background: var(--primary-gold); color: #fff; }
+
+        .service-title { font-size: 1.2rem; font-weight: 600; color: var(--text-dark); margin-bottom: 10px; }
+        .service-desc { color: var(--text-grey); font-size: 0.9rem; margin-bottom: 20px; flex-grow: 1; line-height: 1.6; }
+
+        .service-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 15px; border-top: 1px solid #f0f0f0; margin-bottom: 20px;
+        }
+        .service-price { font-weight: 700; color: var(--text-dark); font-size: 1.1rem; }
+        .service-duration { font-size: 0.85rem; color: var(--text-grey); display: flex; align-items: center; gap: 5px; }
+
+        .btn-book {
+            background: var(--text-dark);
+            color: #fff;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            display: block;
+        }
+        .btn-book:hover { background: var(--primary-gold); color: #fff; }
+
+        .admin-edit-btn {
+            position: absolute; top: 15px; right: 15px;
+            background: #f0f0f0; color: var(--text-grey);
+            border: none; padding: 5px 10px; border-radius: 4px;
+            font-size: 0.75rem; cursor: pointer; display: none; /* Hidden by default */
+        }
+        .admin-edit-btn:hover { background: var(--text-dark); color: #fff; }
+
+        /* Empty & Loading States */
+        .empty-state {
+            text-align: center; padding: 50px 20px;
+            background: var(--white); border-radius: 12px;
+            grid-column: 1 / -1; border: 2px dashed var(--border-color);
+        }
+        .empty-state i { font-size: 3rem; color: var(--primary-gold); margin-bottom: 15px; opacity: 0.5; }
+        .empty-state p { color: var(--text-grey); }
+
+        .skeleton {
+            background: #e0e0e0; border-radius: 16px; height: 300px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.8; } 100% { opacity: 0.6; } }
+
+        /* Sidebar (Desktop) */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0, 0, 0, 0.5); z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        .sidebar {
+            position: fixed; top: 0; right: -300px;
+            width: 280px; height: 100vh;
+            background: var(--white); padding: 25px;
+            transition: right 0.3s ease; z-index: 2001;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+        .sidebar.active { right: 0; }
+
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .close-sidebar { background: #f1f1f1; border: none; color: var(--text-dark); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+
+        .sidebar-menu { list-style: none; flex: 1; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 12px 15px;
+            color: var(--text-grey); text-decoration: none;
+            border-radius: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(212, 175, 55, 0.1); color: var(--primary-gold-dark);
+        }
+        .sidebar-menu i { width: 25px; }
+
+        .signout-btn {
+            background: #ffebee; color: var(--danger); border: none;
+            padding: 12px; border-radius: 8px; width: 100%;
+            font-weight: 600; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+            transition: var(--transition); margin-top: 20px;
+        }
+        .signout-btn:hover { background: var(--danger); color: #fff; }
+
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 30px; border-radius: 50px;
+            z-index: 999; box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .nav-item {
+            text-decoration: none; color: #999;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 0.75rem; transition: var(--transition);
+        }
+        .nav-item i { font-size: 1.3rem; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary-gold); }
+        .nav-item.active i { transform: translateY(-2px); }
+        .nav-item:hover { color: var(--primary-gold-dark); }
+
+        @media(min-width: 769px) { .bottom-nav { display: none; } }
+
+        /* Toast Messages */
+        .message-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 400px; }
+        .message {
+            padding: 12px 15px; border-radius: 8px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); animation: slideDown 0.3s ease;
+        }
+        .message.success { background: #e6f4ea; color: var(--success); border: 1px solid #34a853; }
+        .message.error { background: #fce8e6; color: var(--danger); border: 1px solid #d93025; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header id="header">
+        <a href="dashboard.html" class="logo-container">
+            <img src="images/logo.png" alt="Top Autocare" onerror="this.style.display='none'">
+            <h1 class="logo-title">Top<span>Autocare</span></h1>
+        </a>
+        
+        <div class="header-actions">
+            <div class="notification-bell" onclick="window.location.href='notifications.html'">
+                <i class="far fa-bell"></i>
+                <span class="notification-badge" style="display: none;">0</span>
+            </div>
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()">
+        <div class="sidebar" onclick="event.stopPropagation()">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Menu</h2>
+                <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="myvehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                <li><a href="book-appointment.html"><i class="fas fa-calendar-plus"></i> Book Service</a></li>
+                <li><a href="services.html" class="active"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+            <button class="signout-btn" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Premium Services</h1>
+            <p>Expert care for your vehicle using top-tier equipment and certified mechanics.</p>
+        </div>
+
+        <div id="messageContainer" class="message-container"></div>
+
+        <div id="servicesGrid" class="services-grid">
+            <!-- Skeletons -->
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="myvehicles.html" class="nav-item">
+            <i class="fas fa-car"></i>
+            <span>Vehicles</span>
+        </a>
+        <a href="services.html" class="nav-item active">
+            <i class="fas fa-wrench"></i>
+            <span>Services</span>
+        </a>
+        <a href="book-appointment.html" class="nav-item">
+            <i class="fas fa-calendar-plus"></i>
+            <span>Book</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, orderBy, onSnapshot, getDoc, doc, where, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let currentUser = null;
+        let isAdmin = false;
+        const servicesContainer = document.getElementById('servicesGrid');
+        const messageContainer = document.getElementById('messageContainer');
+
+        // Sidebar
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            document.querySelector('.sidebar').classList.toggle('active');
+        };
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        function showMessage(msg, type) {
+            messageContainer.innerHTML = `<div class="message ${type}"><i class="fas fa-info-circle"></i> ${msg}</div>`;
+            setTimeout(() => messageContainer.innerHTML = '', 3000);
+        }
+
+        async function checkAdmin(user) {
+            if(!user.isAnonymous) {
+                try {
+                    const docSnap = await getDoc(doc(db, 'users', user.uid));
+                    if(docSnap.exists() && docSnap.data().role === 'admin') {
+                        isAdmin = true;
+                    }
+                } catch(e) { console.error('Admin check failed', e); }
+            }
+        }
+
+        function loadServices() {
+            const q = query(collection(db, 'services'), orderBy('name'));
+            
+            onSnapshot(q, (snapshot) => {
+                servicesContainer.innerHTML = '';
+
+                if (snapshot.empty) {
+                    servicesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-tools"></i>
+                            <h3>No Services Found</h3>
+                            <p>Check back later or contact us for a custom quote.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const s = { id: doc.id, ...doc.data() };
+                    renderCard(s);
+                });
+            }, (error) => {
+                console.error(error);
+                servicesContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading services.</p></div>`;
+            });
+        }
+
+        function renderCard(service) {
+            const div = document.createElement('div');
+            div.className = 'service-card';
+            div.innerHTML = `
+                <button class="admin-edit-btn" style="display: ${isAdmin ? 'block' : 'none'}" onclick="editService('${service.id}')"><i class="fas fa-pencil-alt"></i> Edit</button>
+                <div class="service-icon">
+                    <i class="fas fa-${service.icon || 'wrench'}"></i>
+                </div>
+                <div class="service-title">${service.name}</div>
+                <div class="service-desc">${service.description || 'High-quality service for your vehicle.'}</div>
+                <div class="service-meta">
+                    <div class="service-duration"><i class="far fa-clock"></i> ${service.duration || '1h'}</div>
+                    <div class="service-price">KSh ${service.price ? service.price.toLocaleString() : 'TBD'}</div>
+                </div>
+                <a href="book-appointment.html?serviceId=${service.id}" class="btn-book">Book Now</a>
+            `;
+            servicesContainer.appendChild(div);
+        }
+
+        window.editService = (id) => {
+            window.location.href = `admin-services.html?id=${id}`;
+        };
+
+        // Notifications Badge
+        function loadBadge(uid) {
+            const q = query(collection(db, 'notifications'), where('userId', '==', uid), where('read', '==', false));
+            onSnapshot(q, s => {
+                const b = document.querySelector('.notification-badge');
+                if(b) {
+                    b.textContent = s.size > 9 ? '9+' : s.size;
+                    b.style.display = s.size > 0 ? 'flex' : 'none';
+                }
+            });
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await checkAdmin(user);
+                loadServices();
+                if(!user.isAnonymous) loadBadge(user.uid);
+            } else {
+                signInAnonymously(auth); // Allow viewing services without full login
+                loadServices();
+            }
+        });
+
+        // Scroll Logic
+        let lastScroll = 0;
+        const header = document.getElementById('header');
+        const nav = document.querySelector('.bottom-nav');
+        window.addEventListener('scroll', () => {
+            let current = window.pageYOffset;
+            if (current > lastScroll && current > 100) {
+                header.classList.add('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(100px)';
+            } else {
+                header.classList.remove('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(0)';
+            }
+            lastScroll = current <= 0 ? 0 : current;
+        });
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Verify Email - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --success: #28a745;
+            --danger: #dc3545;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Logo Area */
+        .logo-area { margin-bottom: 30px; text-align: center; }
+        .logo-area img { height: 50px; width: auto; margin-bottom: 10px; }
+        .logo-area h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); }
+        .logo-area span { color: var(--primary-gold); }
+
+        /* Verification Card */
+        .verify-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-circle {
+            width: 80px; height: 80px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2.5rem; color: var(--primary-gold);
+        }
+        .icon-circle.success { background: #e6f4ea; color: var(--success); }
+        .icon-circle.error { background: #fce8e6; color: var(--danger); }
+
+        h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 15px; color: var(--text-dark); }
+        p { color: var(--text-grey); font-size: 0.95rem; margin-bottom: 20px; }
+
+        .email-display {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            border: 1px dashed var(--border-color);
+            word-break: break-all;
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 24px; border-radius: 8px; border: none;
+            font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            transition: var(--transition); width: 100%; margin-bottom: 10px;
+            text-decoration: none; gap: 8px;
+        }
+
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-grey); }
+        .btn-secondary:hover { background: #f8f9fa; color: var(--text-dark); }
+
+        .btn-danger-text { color: var(--danger); background: transparent; font-size: 0.9rem; margin-top: 15px; }
+        .btn-danger-text:hover { text-decoration: underline; }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none; align-items: center; justify-content: center; flex-direction: column;
+            z-index: 10;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            border-top-color: var(--primary-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast Messages */
+        .message-container { margin-bottom: 20px; width: 100%; }
+        .message {
+            padding: 12px; border-radius: 8px; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 10px; text-align: left;
+        }
+        .message.success { background: #e6f4ea; color: var(--success); border: 1px solid #c3e6cb; }
+        .message.error { background: #fce8e6; color: var(--danger); border: 1px solid #f5c6cb; }
+        .message.info { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-area">
+        <img src="images/logo.png" alt="Top Autocare" onerror="this.style.display='none'">
+        <h1>Top<span>Autocare</span></h1>
+    </div>
+
+    <!-- Verification Pending -->
+    <div id="verifyContainer" class="verify-card">
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+
+        <div class="icon-circle">
+            <i class="fas fa-envelope-open-text"></i>
+        </div>
+        
+        <h2>Verify Your Email</h2>
+        <p>We've sent a secure verification link to your inbox. Please click the link to activate your account.</p>
+        
+        <div class="email-display" id="userEmail">...</div>
+        
+        <div id="messageContainer" class="message-container"></div>
+
+        <button id="resendBtn" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Resend Email
+        </button>
+
+        <button id="checkStatusBtn" class="btn btn-secondary">
+            <i class="fas fa-sync-alt"></i> I've Verified It
+        </button>
+        
+        <button id="logoutBtn" class="btn btn-danger-text">
+            Sign Out / Use Different Account
+        </button>
+    </div>
+
+    <!-- Verification Success -->
+    <div id="successContainer" class="verify-card" style="display: none;">
+        <div class="icon-circle success">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Email Verified!</h2>
+        <p>Thank you for verifying your email. Your account is now fully active.</p>
+        
+        <a href="signin.html" class="btn btn-primary">Continue to Sign In</a>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, onAuthStateChanged, sendEmailVerification, signOut, applyActionCode 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const verifyContainer = document.getElementById('verifyContainer');
+        const successContainer = document.getElementById('successContainer');
+        const msgBox = document.getElementById('messageContainer');
+        const loading = document.getElementById('loadingOverlay');
+        let checkInterval;
+
+        function showMessage(msg, type) {
+            msgBox.innerHTML = `<div class="message ${type}"><i class="fas fa-info-circle"></i> ${msg}</div>`;
+            setTimeout(() => msgBox.innerHTML = '', 5000);
+        }
+
+        function showLoading(show) {
+            loading.style.display = show ? 'flex' : 'none';
+        }
+
+        // Handle Code from URL
+        async function handleUrlCode() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('oobCode');
+            const mode = params.get('mode');
+
+            if (mode === 'verifyEmail' && code) {
+                showLoading(true);
+                try {
+                    await applyActionCode(auth, code);
+                    showLoading(false);
+                    verifyContainer.style.display = 'none';
+                    successContainer.style.display = 'block';
+                } catch (error) {
+                    showLoading(false);
+                    showMessage('Verification link expired or invalid.', 'error');
+                }
+                return true;
+            }
+            return false;
+        }
+
+        // Check Status Manually
+        async function checkStatus() {
+            const user = auth.currentUser;
+            if (user) {
+                await user.reload();
+                if (user.emailVerified) {
+                    clearInterval(checkInterval);
+                    verifyContainer.style.display = 'none';
+                    successContainer.style.display = 'block';
+                    setTimeout(() => window.location.href = 'signin.html', 2000);
+                }
+            }
+        }
+
+        // Resend Logic
+        document.getElementById('resendBtn').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (user) {
+                showLoading(true);
+                try {
+                    await sendEmailVerification(user);
+                    showMessage('Verification email resent! Check spam folder.', 'success');
+                } catch (error) {
+                    showMessage('Wait a few minutes before retrying.', 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
+        });
+
+        // Manual Check Button
+        document.getElementById('checkStatusBtn').addEventListener('click', async () => {
+            showLoading(true);
+            await checkStatus();
+            showLoading(false);
+            if (verifyContainer.style.display !== 'none') {
+                showMessage('Not verified yet. Please check your inbox.', 'info');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = 'signin.html';
+        });
+
+        // Init
+        onAuthStateChanged(auth, async (user) => {
+            const isUrlVerify = await handleUrlCode();
+            if (isUrlVerify) return;
+
+            if (user) {
+                document.getElementById('userEmail').textContent = user.email;
+                if (user.emailVerified) {
+                    verifyContainer.style.display = 'none';
+                    successContainer.style.display = 'block';
+                    setTimeout(() => window.location.href = 'signin.html', 2000);
+                } else {
+                    checkInterval = setInterval(checkStatus, 5000);
+                }
+            } else {
+                // No user found and no code in URL -> redirect to signin
+                window.location.href = 'signin.html';
+            }
+        });
+
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

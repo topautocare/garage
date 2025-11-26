@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Top Autocare - Premium Garage Services</title>
+    <meta name="description" content="Top Autocare Garage in Nairobi. Diagnostics, Engine Repair, Body Work and Painting.">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/app-icon-192.png">
+    <link rel="apple-touch-icon" href="assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #555555;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {margin:0;padding:0;box-sizing:border-box;}
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---- ANIMATIONS ---- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ---- HEADER ---- */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            padding: 15px 5%; position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;
+        }
+        header.hidden { transform: translateY(-100%); }
+        
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-title { font-size: 22px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .logo-title span { color: var(--primary-gold); }
+
+        .header-actions .signin-btn {
+            text-decoration: none; color: var(--text-dark); font-weight: 600;
+            padding: 8px 24px; border: 2px solid var(--primary-gold); border-radius: 50px;
+            transition: var(--transition); font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+        }
+        .header-actions .signin-btn:hover { background: var(--primary-gold); color: #fff; transform: translateY(-2px); }
+
+        /* ---- HERO SECTION ---- */
+        .hero-section {
+            position: relative; height: 90vh; min-height: 600px;
+            display: flex; align-items: center; justify-content: center;
+            /* High Quality Automotive Background */
+            background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+
+        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 800px; padding: 0 20px; color: #fff; }
+
+        .hero-badge {
+            display: inline-block; background: rgba(212, 175, 55, 0.25); backdrop-filter: blur(5px);
+            color: var(--primary-gold); padding: 8px 20px; border-radius: 50px;
+            font-weight: 600; font-size: 0.85rem; margin-bottom: 20px;
+            border: 1px solid var(--primary-gold); text-transform: uppercase; letter-spacing: 1.5px;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+        }
+        .hero-title span { color: var(--primary-gold); }
+
+        .hero-subtitle {
+            color: #e0e0e0; font-size: clamp(1rem, 3vw, 1.2rem); line-height: 1.6; margin-bottom: 40px; font-weight: 300;
+        }
+
+        .hero-cta-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+
+        .btn-primary {
+            background: var(--primary-gold); color: #000; padding: 16px 40px; border-radius: 50px;
+            font-size: 1rem; font-weight: 700; text-decoration: none; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+            transition: var(--transition); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-primary:hover { background: #fff; transform: translateY(-3px); }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); color: #fff;
+            padding: 16px 35px; border-radius: 50px; font-size: 1rem; font-weight: 600;
+            text-decoration: none; border: 1px solid rgba(255,255,255,0.3);
+            transition: var(--transition); display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-secondary:hover { background: #fff; color: #000; transform: translateY(-3px); }
+
+        /* ---- STATS SECTION ---- */
+        .stats-bar {
+            background: var(--bg-white); padding: 40px 20px; margin-top: -50px; position: relative;
+            z-index: 10; border-radius: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;
+            box-shadow: var(--shadow-md); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 30px;
+        }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: var(--primary-gold); display: block; }
+        .stat-label { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ---- SECTIONS ---- */
+        .section { padding: 80px 20px; }
+        .section.alt-bg { background: var(--bg-white); }
+        .section-header { text-align: center; max-width: 700px; margin: 0 auto 50px; }
+        .section-tag { color: var(--primary-gold-dark); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; display: block; margin-bottom: 10px; }
+        .section-title { font-size: 2.2rem; color: var(--text-dark); font-weight: 700; }
+
+        /* ---- GRID & CARDS ---- */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; max-width: 1200px; margin: 0 auto;
+        }
+
+        .img-card {
+            background: #fff; border-radius: var(--border-radius); overflow: hidden;
+            box-shadow: var(--shadow-sm); transition: var(--transition);
+            display: flex; flex-direction: column; border: 1px solid #eee;
+        }
+        .img-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
+        
+        .img-card-header { height: 220px; overflow: hidden; position: relative; }
+        .img-card-header img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .img-card:hover .img-card-header img { transform: scale(1.1); }
+        
+        .img-card-icon {
+            position: absolute; bottom: -25px; right: 20px; width: 50px; height: 50px;
+            background: var(--primary-gold); border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; color: #000; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .img-card-body { padding: 35px 25px 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .img-card-body h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-dark); }
+        .img-card-body p { color: var(--text-grey); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
+        
+        .text-link { color: var(--primary-gold-dark); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        .text-link:hover { gap: 10px; }
+
+        /* ---- FEATURES SECTION ---- */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .feature-box {
+            background: #fff; padding: 30px; border-radius: 12px; text-align: center; border: 1px solid #eee;
+            transition: var(--transition);
+        }
+        .feature-box:hover { border-color: var(--primary-gold); transform: translateY(-5px); }
+        .feature-icon { font-size: 2.5rem; color: var(--primary-gold); margin-bottom: 15px; }
+        .feature-box h4 { font-size: 1.1rem; margin-bottom: 10px; }
+        .feature-box p { font-size: 0.9rem; color: var(--text-grey); }
+
+        /* ---- FAQ ---- */
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item { background: #fff; margin-bottom: 15px; border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid #eee; }
+        .faq-question { padding: 20px 25px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .faq-answer { padding: 0 25px; max-height: 0; overflow: hidden; color: var(--text-grey); transition: all 0.3s ease; }
+        .faq-item.active .faq-answer { padding-bottom: 25px; max-height: 300px; }
+
+        /* ---- FOOTER ---- */
+        .main-footer { background: #111; color: #fff; padding: 60px 20px 100px 20px; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; }
+        .footer-col h4 { color: var(--primary-gold); margin-bottom: 20px; font-size: 1.2rem; }
+        .footer-links a { display: block; color: #aaa; text-decoration: none; margin-bottom: 10px; transition: 0.3s; }
+        .footer-links a:hover { color: #fff; padding-left: 5px; }
+        .social-icons a { color: #fff; margin-right: 15px; font-size: 1.2rem; transition: 0.3s; }
+        .social-icons a:hover { color: var(--primary-gold); }
+
+        /* ---- BOTTOM NAV ---- */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px; background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); display: flex; justify-content: space-between;
+            padding: 12px 30px; border-radius: 50px; z-index: 9999;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5);
+        }
+        .nav-item { text-decoration: none; color: #aaa; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; transition: var(--transition); }
+        .nav-item i { font-size: 1.3rem; }
+        .nav-item.active { color: var(--primary-gold-dark); }
+        .nav-item:hover { color: var(--primary-gold); }
+
+        @media (max-width: 768px) {
+            .hero-section { background-attachment: scroll; }
+            .stats-bar { margin-top: 20px; margin-bottom: 20px; border-radius: 12px; }
+            .hero-title { font-size: 2.5rem; }
+            .header-actions .signin-btn span { display: none; }
+            .header-actions .signin-btn { padding: 8px; width: 40px; height: 40px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<!-- HEADER -->
+<header id="header">
+   <a href="index.html" class="logo-container">
+       <img src="assets/images/logo.png" alt="Top Autocare" style="height: 45px; width: auto;" onerror="this.style.display='none'">
+       <h1 class="logo-title">Top<span>Autocare</span></h1>
+   </a>
+   
+   <div class="header-actions">
+       <a href="signin.html" class="signin-btn">
+           <i class="fas fa-user"></i>
+           <span>Sign In</span>
+       </a>
+   </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-badge reveal active">
+            <i class="fas fa-check-circle"></i> #1 Auto Garage in Nairobi
+        </div>
+        <h1 class="hero-title reveal active">
+            Experience The <br><span>Gold Standard</span>
+        </h1>
+        <p class="hero-subtitle reveal active">
+            From advanced diagnostics to precision bodywork, we bring dealership quality service to you at affordable rates.
+        </p>
+        
+        <div class="hero-cta-group reveal active">
+            <a href="book-appointment.html" class="btn-primary">
+                Book Appointment <i class="fas fa-calendar-check"></i>
+            </a>
+            <a href="services.html" class="btn-secondary">
+                <i class="fas fa-wrench"></i> View Services
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar reveal">
+    <div class="stat-item">
+        <span class="stat-number">500+</span>
+        <span class="stat-label">Cars Fixed</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">98%</span>
+        <span class="stat-label">Happy Clients</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">24/7</span>
+        <span class="stat-label">Support</span>
+    </div>
+</div>
+
+<!-- WHY CHOOSE US -->
+<section class="section">
+    <div class="section-header reveal">
+        <span class="section-tag">Why Us</span>
+        <h2 class="section-title">The Top Autocare Difference</h2>
+    </div>
+    <div class="features-grid reveal">
+        <div class="feature-box">
+            <i class="fas fa-laptop-medical feature-icon"></i>
+            <h4>Advanced Diagnostics</h4>
+            <p>We use the latest OBD-II scanners to pinpoint issues with 100% accuracy.</p>
+        </div>
+        <div class="feature-box">
+            <i class="fas fa-certificate feature-icon"></i>
+            <h4>Certified Mechanics</h4>
+            <p>Our team consists of vetted professionals with years of experience.</p>
+        </div>
+        <div class="feature-box">
+            <i class="fas fa-tag feature-icon"></i>
+            <h4>Fair Pricing</h4>
+            <p>Transparent quotes with no hidden fees. You pay for what we fix.</p>
+        </div>
+        <div class="feature-box">
+            <i class="fas fa-clock feature-icon"></i>
+            <h4>Quick Turnaround</h4>
+            <p>We value your time. Most services are completed within 24 hours.</p>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES SECTION -->
+<section class="section alt-bg" id="services">
+    <div class="section-header reveal">
+        <span class="section-tag">What We Do</span>
+        <h2 class="section-title">Premium Services</h2>
+    </div>
+
+    <div class="grid-container">
+        <!-- Service 1: Routine Maintenance -->
+        <div class="img-card reveal">
+            <div class="img-card-header">
+                <img src="assets/images/maintenance.png" alt="Routine Maintenance">
+                <div class="img-card-icon"><i class="fas fa-tools"></i></div>
+            </div>
+            <div class="img-card-body">
+                <h3>Routine Maintenance</h3>
+                <p>Keep your vehicle reliable with our comprehensive service packages including oil changes, filter replacements, fluid top-ups, and digital safety inspections.</p>
+                <a href="services.html" class="text-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Service 2: Engine Overhaul -->
+        <div class="img-card reveal">
+            <div class="img-card-header">
+                <img src="assets/images/engine.png" alt="Engine Overhaul">
+                <div class="img-card-icon"><i class="fas fa-cogs"></i></div>
+            </div>
+            <div class="img-card-body">
+                <h3>Engine Overhaul</h3>
+                <p>Restore your engine to factory specifications. We specialize in head gasket replacements, valve timing, piston work, and complete engine rebuilding.</p>
+                <a href="services.html" class="text-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BLOG SECTION -->
+<section class="section">
+    <div class="section-header reveal">
+        <span class="section-tag">The Garage Log</span>
+        <h2 class="section-title">Latest Updates</h2>
+    </div>
+    <div class="grid-container" id="blogsContainer">
+        <div style="text-align: center; width: 100%; grid-column: 1/-1; padding: 40px;">
+            <i class="fas fa-circle-notch fa-spin" style="color: var(--primary-gold); font-size: 2em;"></i>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="section alt-bg" id="faq">
+    <div class="section-header reveal">
+        <span class="section-tag">Support</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+    </div>
+    <div class="faq-container reveal">
+        <div class="faq-item">
+            <div class="faq-question">
+                How do I book a service?
+                <i class="fas fa-plus" style="color: var(--primary-gold); font-size: 0.8em;"></i>
+            </div>
+            <div class="faq-answer">
+                Click "Book Appointment" at the top, create an account, and select your preferred date and service type.
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">
+                Where are you located?
+                <i class="fas fa-plus" style="color: var(--primary-gold); font-size: 0.8em;"></i>
+            </div>
+            <div class="faq-answer">
+                We are located at Milestone Business Centre, Total Energies Ridgeways, Kiambu Road, Nairobi.
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">
+                Do you offer warranties?
+                <i class="fas fa-plus" style="color: var(--primary-gold); font-size: 0.8em;"></i>
+            </div>
+            <div class="faq-answer">
+                Yes, all our parts and major repairs come with a specific warranty period discussed before service.
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-col">
+            <h4>Top Autocare</h4>
+            <p style="color: #aaa; line-height: 1.6;">Your trusted partner for all automotive needs in Nairobi. Quality service, guaranteed.</p>
+            <div class="social-icons" style="margin-top: 20px;">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <div class="footer-links">
+                <a href="services.html">Our Services</a>
+                <a href="book-appointment.html">Book Appointment</a>
+                <a href="myvehicles.html">Track My Car</a>
+                <a href="faq.html">FAQ</a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Contact Us</h4>
+            <div class="footer-links">
+                <a href="tel:+254757562447"><i class="fas fa-phone-alt"></i> +254 757 562 447</a>
+                <a href="mailto:bk560471@gmail.com"><i class="fas fa-envelope"></i> bk560471@gmail.com</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Kiambu Road, Nairobi</a>
+            </div>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 40px; color: #555; font-size: 0.8rem;">
+        &copy; 2025 Top Autocare Garage. All Rights Reserved.
+    </div>
+</footer>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item active">
+        <i class="fas fa-home"></i> <span>Home</span>
+    </a>
+    <a href="services.html" class="nav-item">
+        <i class="fas fa-wrench"></i> <span>Services</span>
+    </a>
+    <a href="https://www.mediafire.com/file/b0ll47xkaes2kel/top-autocare.apk/file" target="_blank" class="nav-item">
+        <i class="fas fa-download"></i> <span>App</span>
+    </a>
+    <a href="myvehicles.html" class="nav-item">
+        <i class="fas fa-car"></i> <span>My Car</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i> <span>Profile</span>
+    </a>
+</nav>
+
+<!-- FIREBASE SCRIPTS -->
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, collection, query, orderBy, limit, getDocs, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+        authDomain: "top-autocare.firebaseapp.com",
+        projectId: "top-autocare",
+        storageBucket: "top-autocare.firebasestorage.app",
+        messagingSenderId: "879247821822",
+        appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+        measurementId: "G-T5NDM5M33Z"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // Enable Offline Persistence
+    enableIndexedDbPersistence(db).catch((err) => {
+        if (err.code == 'failed-precondition') {
+            console.log('Persistence failed: Multiple tabs open.');
+        } else if (err.code == 'unimplemented') {
+            console.log('Persistence not supported by browser.');
+        }
+    });
+
+    /* Auth State */
+    onAuthStateChanged(auth, (user) => {
+        const signinBtn = document.querySelector('.signin-btn');
+        if (signinBtn) {
+            if (user) {
+                signinBtn.href = "profile.html";
+                signinBtn.innerHTML = '<i class="fas fa-user-check"></i><span>Profile</span>';
+            } else {
+                signinBtn.href = "signin.html";
+                signinBtn.innerHTML = '<i class="fas fa-user"></i><span>Sign In</span>';
+            }
+        }
+        loadBlogs();
+    });
+
+    /* Dynamic Blog Loader */
+    async function loadBlogs() {
+        const container = document.getElementById('blogsContainer');
+        try {
+            const q = query(collection(db, 'blogs'), orderBy('timestamp', 'desc'), limit(3));
+            const querySnapshot = await getDocs(q);
+            
+            container.innerHTML = '';
+            
+            if (querySnapshot.empty) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #777;">Updates coming soon.</div>`;
+                return;
+            }
+
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                // Fallback image related to cars
+                const imgUrl = data.image || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=600&q=80';
+                // Handle Firestore Timestamp
+                let dateStr = 'Just Now';
+                if(data.timestamp && typeof data.timestamp.toDate === 'function') {
+                    dateStr = new Date(data.timestamp.toDate()).toLocaleDateString();
+                }
+                
+                const html = `
+                <div class="img-card">
+                    <div class="img-card-header">
+                        <img src="${imgUrl}" alt="${data.title}" loading="lazy">
+                    </div>
+                    <div class="img-card-body">
+                        <div style="color: var(--primary-gold-dark); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 5px;">${dateStr}</div>
+                        <h3>${data.title}</h3>
+                        <p>${data.body ? data.body.substring(0, 90) + '...' : ''}</p>
+                        <a href="blog.html?post=${docSnap.id}" class="text-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+
+        } catch (e) {
+            console.error("Error loading blogs", e);
+            // Don't show error to user if offline and cached not available yet, just keep loader or show empty
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Header Scroll Logic
+        const header = document.getElementById('header');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll <= 0) header.classList.remove('hidden');
+            else {
+                if (currentScroll > lastScroll && currentScroll > 100) header.classList.add('hidden');
+                else header.classList.remove('hidden');
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('.faq-question').addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                document.querySelectorAll('.faq-item').forEach(i => {
+                    i.classList.remove('active');
+                    i.querySelector('.fas').className = 'fas fa-plus';
+                });
+                if (!isActive) {
+                    item.classList.add('active');
+                    item.querySelector('.fas').className = 'fas fa-minus';
+                }
+            });
+        });
+    });
+</script>
+
+<!-- PWA Init -->
+<script src="/js/pwa-init.js"></script>
+
+</body>
+</html>

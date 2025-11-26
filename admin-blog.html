@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Blog Management - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+
+        /* ---- BLOG PAGE SPECIFIC ---- */
+        .page-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 15px;
+        }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); transform: translateY(-2px); }
+        
+        .btn-secondary { background: var(--white); border: 1px solid var(--border-color); color: var(--text-dark); }
+        .btn-secondary:hover { border-color: var(--text-dark); background: #f8f9fa; }
+
+        .btn-danger { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+        
+        .btn-gold {
+            background: var(--primary-gold); color: #fff; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+        }
+        .btn-gold:hover { background: var(--primary-gold-dark); }
+        
+        /* Add Blog Form Panel */
+        .form-panel {
+            background: var(--white); border-radius: 12px; padding: 30px;
+            box-shadow: var(--shadow-md); border: 1px solid var(--border-color);
+            margin-bottom: 30px; display: none; /* Hidden by default */
+        }
+        .form-panel.active { display: block; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-dark); }
+        .form-input {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: inherit; font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus { border-color: var(--primary-gold); outline: none; }
+        textarea.form-input { min-height: 150px; resize: vertical; }
+
+        /* Blog Grid */
+        .blog-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;
+        }
+
+        .blog-card {
+            background: var(--white); border-radius: 12px; overflow: hidden;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            transition: var(--transition); display: flex; flex-direction: column;
+            height: 100%;
+        }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary-gold); }
+
+        .blog-img {
+            height: 180px; overflow: hidden; background: #f0f0f0; position: relative;
+        }
+        .blog-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .blog-card:hover .blog-img img { transform: scale(1.05); }
+
+        .blog-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .blog-date { font-size: 0.8rem; color: var(--text-grey); margin-bottom: 8px; display: block; }
+        .blog-title { 
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; 
+            color: var(--text-dark); line-height: 1.3;
+        }
+        .blog-excerpt { font-size: 0.9rem; color: var(--text-grey); line-height: 1.5; margin-bottom: 20px; flex: 1; }
+
+        .blog-actions {
+            display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding: 15px 20px;
+        }
+        .action-btn {
+            padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: var(--transition);
+        }
+        .btn-delete { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .btn-delete:hover { background: var(--danger); color: #fff; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--text-grey); grid-column: 1/-1;
+            background: var(--white); border-radius: 12px; border: 1px solid var(--border-color);
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 20px; opacity: 0.3; color: var(--primary-gold); }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 2000; }
+        .toast {
+            padding: 15px 20px; background: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 10px; border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+            .page-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <!-- Consistent Navigation -->
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html" class="active"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-gold" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div style="font-weight: 600;">Admin Panel</div>
+        </header>
+
+        <div class="page-container">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Blog Posts</h1>
+                    <p>Manage news and updates visible to your customers.</p>
+                </div>
+                <button class="btn btn-primary" onclick="toggleAddForm()">
+                    <i class="fas fa-plus"></i> Create New Post
+                </button>
+            </div>
+
+            <!-- Add/Edit Form -->
+            <div id="blogFormPanel" class="form-panel">
+                <h3 style="margin-bottom: 20px; color: var(--primary-gold-dark);"><i class="fas fa-pen"></i> Create New Post</h3>
+                <form id="newBlogForm">
+                    <div class="form-group">
+                        <label class="form-label">Post Title</label>
+                        <input type="text" id="blogTitle" class="form-input" placeholder="e.g. 5 Tips for Engine Maintenance" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Featured Image</label>
+                        <input type="file" id="blogImage" class="form-input" accept="image/*">
+                        <small style="color: var(--text-grey); margin-top: 5px; display: block;">Recommended: 800x400px. Supported: JPG, PNG.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Content</label>
+                        <textarea id="blogBody" class="form-input" placeholder="Write your article content here..." required></textarea>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Publish Now</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Blog Grid -->
+            <div id="blogsGrid" class="blog-grid">
+                <!-- Loading State -->
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading articles...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, orderBy, onSnapshot, 
+            addDoc, deleteDoc, doc, getDoc, serverTimestamp, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let currentUser = null;
+        const blogsGrid = document.getElementById('blogsGrid');
+        const blogFormPanel = document.getElementById('blogFormPanel');
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                if (uSnap.exists() && (uSnap.data().role === 'admin' || uSnap.data().isAdmin)) {
+                    currentUser = user;
+                    loadBlogs();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Load Blogs Realtime
+        function loadBlogs() {
+            const q = query(collection(db, 'blogs'), orderBy('timestamp', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    blogsGrid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-newspaper"></i>
+                            <p>No blog posts found. Create one above!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                blogsGrid.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    let date = 'Just Now';
+                    // Check if timestamp exists and is a Firestore Timestamp object
+                    if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+                        date = new Date(data.timestamp.toDate()).toLocaleDateString();
+                    }
+                    
+                    // Fallback image
+                    const imgUrl = data.image || 'https://via.placeholder.com/400x200?text=No+Image';
+
+                    const card = document.createElement('div');
+                    card.className = 'blog-card';
+                    card.innerHTML = `
+                        <div class="blog-img">
+                            <img src="${imgUrl}" alt="${data.title}" onerror="this.src='https://via.placeholder.com/400x200?text=Error+Loading+Image'" loading="lazy">
+                        </div>
+                        <div class="blog-body">
+                            <span class="blog-date"><i class="far fa-calendar-alt"></i> ${date}</span>
+                            <h3 class="blog-title">${data.title}</h3>
+                            <p class="blog-excerpt">${data.body ? data.body.substring(0, 100) + '...' : ''}</p>
+                        </div>
+                        <div class="blog-actions">
+                            <button class="action-btn btn-delete" onclick="deletePost('${doc.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    `;
+                    blogsGrid.appendChild(card);
+                });
+            });
+        }
+
+        // Toggle Form Visibility
+        window.toggleAddForm = () => {
+            const isActive = blogFormPanel.classList.contains('active');
+            if(isActive) {
+                blogFormPanel.classList.remove('active');
+                setTimeout(() => blogFormPanel.style.display = 'none', 300);
+            } else {
+                blogFormPanel.style.display = 'block';
+                setTimeout(() => blogFormPanel.classList.add('active'), 10);
+                document.getElementById('blogTitle').focus();
+            }
+        };
+
+        // Add New Blog
+        document.getElementById('newBlogForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+
+            try {
+                const title = document.getElementById('blogTitle').value.trim();
+                const body = document.getElementById('blogBody').value.trim();
+                const imageFile = document.getElementById('blogImage').files[0];
+
+                let imageUrl = '';
+                if (imageFile) {
+                    // Basic check for file size (e.g., 2MB limit)
+                    if (imageFile.size > 2 * 1024 * 1024) {
+                        throw new Error("Image size too large. Please upload an image under 2MB.");
+                    }
+
+                    const storageRef = ref(storage, `blogs/${Date.now()}_${imageFile.name}`);
+                    try {
+                        const snap = await uploadBytes(storageRef, imageFile);
+                        imageUrl = await getDownloadURL(snap.ref);
+                    } catch (uploadErr) {
+                        console.error("Image upload failed:", uploadErr);
+                        showToast('Image upload failed, posting without image.', 'error');
+                    }
+                }
+
+                await addDoc(collection(db, 'blogs'), {
+                    title,
+                    body,
+                    image: imageUrl,
+                    authorId: currentUser.uid,
+                    timestamp: serverTimestamp()
+                });
+
+                showToast('Blog published successfully!', 'success');
+                e.target.reset();
+                toggleAddForm();
+
+            } catch (error) {
+                console.error(error);
+                showToast(error.message || 'Failed to publish blog.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+
+        // Delete Post
+        window.deletePost = async (id) => {
+            if(confirm('Are you sure you want to permanently delete this post?')) {
+                try {
+                    await deleteDoc(doc(db, 'blogs', id));
+                    showToast('Post deleted.', 'success');
+                } catch(e) {
+                    console.error(e);
+                    showToast('Error deleting post.', 'error');
+                }
+            }
+        };
+
+        // Toast Helper
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        // Mobile Sidebar
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

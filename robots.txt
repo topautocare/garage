@@ -1,0 +1,34 @@
+# Group 1: All Search Engines
+User-agent: *
+
+# --- Allow indexing of public marketing pages ---
+Allow: /
+Allow: /index.html
+Allow: /services.html
+Allow: /book-appointment.html
+Allow: /terms-of-service.html
+Allow: /privacy-policy.html
+
+# --- Prevent indexing of private User App areas ---
+# Users need to be logged in to see these, so Google shouldn't link to them.
+Disallow: /dashboard.html
+Disallow: /myvehicles.html
+Disallow: /profile.html
+
+# --- Prevent indexing of Auth flows ---
+Disallow: /signin.html
+Disallow: /signup.html
+Disallow: /verify-email.html
+Disallow: /forgot-password.html
+
+# --- Prevent indexing of Technical/Config files ---
+Disallow: /package.json
+Disallow: /firebase.json
+Disallow: /sw.js
+Disallow: /service-worker-manager.js
+Disallow: /analytics.js
+Disallow: /.htaccess
+
+# --- Sitemap Location ---
+# (Replace with your actual Firebase URL once deployed)
+Sitemap: https://top-autocare.web.app/sitemap.xml

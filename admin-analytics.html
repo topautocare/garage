@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Reports - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-logout { 
+            width: 100%; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; 
+            border: none; padding: 10px; border-radius: 6px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .btn-logout:hover { background: #dc3545; color: #fff; }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+
+        /* ---- ANALYTICS SPECIFIC ---- */
+        .page-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
+        }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Filter Controls */
+        .filter-container { display: flex; align-items: center; gap: 10px; }
+        .filter-group {
+            display: flex; background: var(--white); padding: 5px;
+            border-radius: 8px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+        }
+        .filter-btn {
+            padding: 8px 16px; border: none; background: transparent;
+            color: var(--text-grey); cursor: pointer; font-weight: 500;
+            border-radius: 6px; transition: var(--transition); font-size: 0.9rem;
+        }
+        .filter-btn:hover { color: var(--text-dark); background: rgba(0,0,0,0.03); }
+        .filter-btn.active { background: var(--primary-gold); color: #fff; font-weight: 600; }
+
+        .refresh-btn {
+            background: var(--white); color: var(--text-dark);
+            border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 8px;
+            cursor: pointer; font-weight: 500; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .refresh-btn:hover { border-color: var(--primary-gold); color: var(--primary-gold); }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px; margin-bottom: 30px;
+        }
+        .summary-card {
+            background: var(--white); padding: 25px; border-radius: 12px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; transition: var(--transition);
+        }
+        .summary-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--primary-gold); }
+        
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-icon {
+            width: 45px; height: 45px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        .icon-gold { background: rgba(212, 175, 55, 0.1); color: var(--primary-gold); }
+        .icon-blue { background: rgba(23, 162, 184, 0.1); color: var(--info); }
+        .icon-green { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .icon-grey { background: rgba(108, 117, 125, 0.1); color: var(--text-grey); }
+
+        .metric-val { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
+        .metric-label { font-size: 0.9rem; color: var(--text-grey); }
+        
+        .trend { font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .trend.up { color: var(--success); }
+        .trend.down { color: var(--danger); }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+        }
+        .chart-card {
+            background: var(--white); border-radius: 12px; padding: 25px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            height: 400px; display: flex; flex-direction: column;
+        }
+        .chart-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .chart-header h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-dark); }
+        
+        .chart-container { flex: 1; position: relative; width: 100%; overflow: hidden; }
+
+        /* Loader */
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8); z-index: 2000;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            display: none;
+        }
+        .loader-overlay.active { display: flex; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 3000; }
+        .toast {
+            padding: 15px 25px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .chart-card { height: 350px; }
+            .page-header { flex-direction: column; align-items: flex-start; }
+            .filter-container { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay & Loader -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="loader-overlay" id="loader">
+        <i class="fas fa-circle-notch fa-spin fa-2x" style="color: var(--primary-gold)"></i>
+        <p style="margin-top: 10px; color: var(--text-dark); font-weight: 500;">Collecting data...</p>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <!-- Consistent Navigation -->
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html" class="active"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div style="font-weight: 600; color: var(--text-dark);">Admin Panel</div>
+        </header>
+
+        <div class="page-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Reports & Analytics</h1>
+                    <p>Deep dive into your garage's booking performance and revenue.</p>
+                </div>
+                
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-range="30" onclick="changeRange(30)">30 Days</button>
+                        <button class="filter-btn" data-range="90" onclick="changeRange(90)">90 Days</button>
+                        <button class="filter-btn" data-range="all" onclick="changeRange('all')">All Time</button>
+                    </div>
+                    <button class="refresh-btn" onclick="loadData()" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <!-- Revenue -->
+                <div class="summary-card">
+                    <div class="card-top">
+                        <div class="card-icon icon-gold"><i class="fas fa-coins"></i></div>
+                    </div>
+                    <div class="metric-val" id="valRevenue">KES 0</div>
+                    <div class="metric-label">Estimated Revenue</div>
+                </div>
+
+                <!-- Appointments -->
+                <div class="summary-card">
+                    <div class="card-top">
+                        <div class="card-icon icon-blue"><i class="fas fa-calendar-check"></i></div>
+                    </div>
+                    <div class="metric-val" id="valBookings">0</div>
+                    <div class="metric-label">Total Bookings</div>
+                </div>
+
+                <!-- Users -->
+                <div class="summary-card">
+                    <div class="card-top">
+                        <div class="card-icon icon-green"><i class="fas fa-users"></i></div>
+                        <div class="trend" id="growthTrend">
+                            <span id="valGrowth">0%</span> Growth
+                        </div>
+                    </div>
+                    <div class="metric-val" id="valUsers">0</div>
+                    <div class="metric-label">Total Customers</div>
+                </div>
+
+                <!-- Vehicles -->
+                <div class="summary-card">
+                    <div class="card-top">
+                        <div class="card-icon icon-grey"><i class="fas fa-car"></i></div>
+                    </div>
+                    <div class="metric-val" id="valVehicles">0</div>
+                    <div class="metric-label">Registered Vehicles</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <!-- Revenue Line Chart -->
+                <div class="chart-card" style="grid-column: 1 / -1;">
+                    <div class="chart-header">
+                        <h3>Booking & Revenue Trend</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Service Type Bar -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Popular Services</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="serviceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Vehicle Makes Doughnut -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Vehicle Fleet Breakdown</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="vehicleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, where, getDocs, doc, getDoc, Timestamp, orderBy, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- SPECIFIC SERVICES PRICE MAP ---
+        const standardServicePrices = {
+            "Engine Overhaul": 40000,
+            "Routine Maintenance": 12000,
+            // Handle lowercase variations just in case
+            "Routine maintenance": 12000,
+            "routine maintenance": 12000,
+            "engine overhaul": 40000
+        };
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let currentRange = 30;
+        let chartInstances = {};
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                if (uSnap.exists() && (uSnap.data().role === 'admin' || uSnap.data().isAdmin)) {
+                    loadData();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Range Buttons logic
+        window.changeRange = (range) => {
+            currentRange = range;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.filter-btn[data-range="${range}"]`).classList.add('active');
+            loadData();
+        };
+
+        // Helper: Get Start Date
+        function getStartDate() {
+            if (currentRange === 'all') return new Date(0); // Epoch time
+            const date = new Date();
+            date.setDate(date.getDate() - currentRange);
+            return date;
+        }
+
+        // Main Data Loader
+        window.loadData = async () => {
+            document.getElementById('loader').classList.add('active');
+            const startDate = getStartDate();
+            const startTimestamp = Timestamp.fromDate(startDate);
+
+            try {
+                // 1. Fetch Appointments within date range
+                const apptQ = query(
+                    collection(db, 'appointments'),
+                    where('timestamp', '>=', startTimestamp),
+                    orderBy('timestamp', 'asc')
+                );
+                const apptSnap = await getDocs(apptQ);
+
+                let revenue = 0;
+                let bookingCount = 0;
+                let monthlyRevenue = {};
+                let servicesCount = {};
+
+                apptSnap.forEach(doc => {
+                    const data = doc.data();
+                    bookingCount++;
+                    
+                    // --- Price Estimation Logic ---
+                    let price = 0;
+                    
+                    // Priority 1: Use specific price saved in database (Manual Override)
+                    if (data.price) {
+                         price = parseFloat(data.price.toString().replace(/[^0-9.]/g, ''));
+                    } 
+                    // Priority 2: Use Service Lookup Map (Exact Match)
+                    else if (data.serviceType && standardServicePrices[data.serviceType]) {
+                        price = standardServicePrices[data.serviceType];
+                    }
+                    else if (data.service && standardServicePrices[data.service]) {
+                        price = standardServicePrices[data.service];
+                    }
+                    // Priority 3: Fuzzy Match from Service String (Only for Engine & Maintenance)
+                    else {
+                        const sName = (data.service || data.serviceType || "").toString();
+                        
+                        if(sName.includes("Engine") || sName.includes("Overhaul")) {
+                            price = 40000;
+                        } 
+                        else if(sName.includes("Maintenance") || sName.includes("Routine")) {
+                            price = 12000;
+                        } 
+                        else {
+                            // Default to 0 if doesn't match the two active services to keep analytics strict
+                            price = 0; 
+                        }
+                    }
+
+                    // Only count revenue for completed/confirmed jobs
+                    if(data.status === 'completed' || data.status === 'confirmed') {
+                        revenue += price;
+                    }
+
+                    // Timeline Labels (e.g., "Oct 12")
+                    let dateKey = "Unknown";
+                    if(data.timestamp) {
+                        const date = data.timestamp.toDate();
+                        dateKey = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        // Aggregate Revenue per day
+                        if(data.status === 'completed' || data.status === 'confirmed') {
+                            monthlyRevenue[dateKey] = (monthlyRevenue[dateKey] || 0) + price;
+                        } else {
+                            // Initialize key even if 0 revenue so chart line doesn't break
+                             if(!monthlyRevenue[dateKey]) monthlyRevenue[dateKey] = 0;
+                        }
+                    }
+
+                    // Service aggregation
+                    const svc = data.service || data.serviceType || 'General';
+                    servicesCount[svc] = (servicesCount[svc] || 0) + 1;
+                });
+
+                // 2. Fetch Users (Total + Growth calc)
+                const totalUsersSnap = await getDocs(collection(db, 'users'));
+                let totalUsers = totalUsersSnap.size;
+                
+                // Count new users in period
+                let newUsers = 0;
+                totalUsersSnap.forEach(doc => {
+                    const userData = doc.data();
+                    if(userData.createdAt && userData.createdAt.toDate() >= startDate) {
+                        newUsers++;
+                    }
+                });
+
+                const prevUsers = totalUsers - newUsers;
+                const growth = prevUsers > 0 ? ((newUsers / prevUsers) * 100).toFixed(1) : '100';
+
+                // 3. Fetch Vehicles for Makes Chart
+                const vehicleSnap = await getDocs(collection(db, 'vehicles'));
+                let vehicleMakes = {};
+                vehicleSnap.forEach(doc => {
+                    const mk = doc.data().make || 'Other';
+                    vehicleMakes[mk] = (vehicleMakes[mk] || 0) + 1;
+                });
+
+                // Update UI Text
+                document.getElementById('valRevenue').innerText = `KES ${revenue.toLocaleString()}`;
+                document.getElementById('valBookings').innerText = bookingCount;
+                document.getElementById('valUsers').innerText = totalUsers;
+                document.getElementById('valVehicles').innerText = vehicleSnap.size;
+                
+                const growthEl = document.getElementById('valGrowth');
+                growthEl.innerText = `+${growth}%`;
+                const trendParent = document.getElementById('growthTrend');
+                trendParent.className = 'trend'; // Reset
+                if(parseFloat(growth) >= 0) trendParent.classList.add('up');
+                else trendParent.classList.add('down');
+
+                // Render Charts
+                renderRevenueChart(monthlyRevenue);
+                renderServiceChart(servicesCount);
+                renderVehicleChart(vehicleMakes);
+
+                showToast('Analytics updated successfully', 'success');
+
+            } catch (error) {
+                console.error("Analytics Error:", error);
+                // Handle Firestore Index Errors specifically
+                if(error.message.indexOf('index') !== -1) {
+                    alert("Firestore Index Required. Check console.");
+                } else {
+                    showToast('Error loading analytics', 'error');
+                }
+            } finally {
+                document.getElementById('loader').classList.remove('active');
+            }
+        };
+
+        // --- Chart Renderers ---
+
+        function renderRevenueChart(dataObj) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            if(chartInstances.revenue) chartInstances.revenue.destroy();
+
+            chartInstances.revenue = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(dataObj),
+                    datasets: [{
+                        label: 'Revenue (KES)',
+                        data: Object.values(dataObj),
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { borderDash: [5, 5] }, beginAtZero: true },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderServiceChart(dataObj) {
+            const ctx = document.getElementById('serviceChart').getContext('2d');
+            if(chartInstances.service) chartInstances.service.destroy();
+
+            // Sort and take top 7
+            const sorted = Object.entries(dataObj).sort((a,b) => b[1] - a[1]).slice(0, 7);
+
+            chartInstances.service = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(i => i[0]),
+                    datasets: [{
+                        label: 'Bookings',
+                        data: sorted.map(i => i[1]),
+                        backgroundColor: '#1a1a1a', // Dark charcoal
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderVehicleChart(dataObj) {
+            const ctx = document.getElementById('vehicleChart').getContext('2d');
+            if(chartInstances.vehicle) chartInstances.vehicle.destroy();
+
+            // Sort and limit to top 5 makes
+            const sorted = Object.entries(dataObj).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            
+            chartInstances.vehicle = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sorted.map(i => i[0]),
+                    datasets: [{
+                        data: sorted.map(i => i[1]),
+                        backgroundColor: ['#d4af37', '#333333', '#8e8e8e', '#e0e0e0', '#b8962e'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true } } 
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // UI Helper
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

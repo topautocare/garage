@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Backup & Restore - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+        
+        .btn-gold {
+            background: var(--primary-gold); color: #fff; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+        }
+        .btn-gold:hover { background: var(--primary-gold-dark); }
+
+        /* ---- PAGE SPECIFIC ---- */
+        .page-container { padding: 30px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-header p { color: var(--text-grey); font-size: 0.95rem; }
+
+        /* Cards */
+        .section-card {
+            background: var(--white); border-radius: 12px; padding: 30px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            margin-bottom: 30px; position: relative; overflow: hidden;
+        }
+
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section-header h2 { font-size: 1.2rem; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+
+        /* Backup Options Grid */
+        .backup-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .backup-option {
+            background: var(--bg-light); padding: 20px; border-radius: 10px;
+            text-align: center; border: 1px solid transparent; transition: var(--transition);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .backup-option:hover { border-color: var(--primary-gold); background: #fff; transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+        
+        .icon-wrapper {
+            width: 60px; height: 60px; background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold); border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+        }
+
+        .backup-option h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .backup-option p { font-size: 0.85rem; color: var(--text-grey); margin-bottom: 20px; flex: 1; }
+
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; width: 100%; justify-content: center; }
+        .btn-primary:hover { background: var(--primary-gold-dark); }
+        
+        .btn-warning { background: rgba(255, 193, 7, 0.1); color: #856404; border: 1px solid #ffeeba; }
+        .btn-warning:hover { background: #ffc107; color: #000; }
+
+        /* Restore Area */
+        .drop-zone {
+            border: 2px dashed var(--border-color); border-radius: 12px;
+            padding: 40px; text-align: center; background: var(--bg-light);
+            transition: var(--transition); cursor: pointer; position: relative;
+        }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary-gold); background: rgba(212, 175, 55, 0.05); }
+        
+        .drop-zone i { font-size: 3rem; color: #ccc; margin-bottom: 15px; }
+        .drop-zone p { color: var(--text-grey); margin-bottom: 20px; }
+        .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+        .alert-warning {
+            background: #fff3cd; color: #856404; padding: 15px;
+            border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+        }
+
+        /* Progress Bar */
+        .progress-container { display: none; margin-top: 20px; }
+        .progress-bar { height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary-gold); width: 0%; transition: width 0.3s; }
+        .progress-text { font-size: 0.8rem; color: var(--text-grey); margin-top: 5px; text-align: center; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 2000; }
+        .toast {
+            padding: 15px 20px; background: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 10px; border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <!-- Consistent Navigation -->
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html" class="active"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-gold" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div style="font-weight: 600;">Admin Panel</div>
+        </header>
+
+        <div class="page-container">
+            <div class="page-header">
+                <h1>System Backup</h1>
+                <p>Securely export database collections or restore from validated JSON files.</p>
+            </div>
+
+            <!-- Backup Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fas fa-download"></i> Export Data</h2>
+                </div>
+                
+                <div class="backup-grid">
+                    <div class="backup-option">
+                        <div class="icon-wrapper"><i class="fas fa-database"></i></div>
+                        <h3>Full Backup</h3>
+                        <p>Exports all collections (Users, Appointments, Vehicles, Services, Blogs, Notifications) into one file.</p>
+                        <button class="btn btn-primary" onclick="startBackup('full')">Download Full Backup</button>
+                    </div>
+
+                    <div class="backup-option">
+                        <div class="icon-wrapper"><i class="fas fa-users"></i></div>
+                        <h3>Users Only</h3>
+                        <p>Exports only User profiles and their associated role data.</p>
+                        <button class="btn btn-primary" onclick="startBackup('users')">Download Users</button>
+                    </div>
+
+                    <div class="backup-option">
+                        <div class="icon-wrapper"><i class="fas fa-calendar-check"></i></div>
+                        <h3>Appointments Only</h3>
+                        <p>Exports booking history and current service requests.</p>
+                        <button class="btn btn-primary" onclick="startBackup('appointments')">Download Bookings</button>
+                    </div>
+                </div>
+
+                <div class="progress-container" id="backupProgress">
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+                    <div class="progress-text">Preparing data...</div>
+                </div>
+            </div>
+
+            <!-- Restore Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fas fa-upload"></i> Restore Data</h2>
+                </div>
+
+                <div class="alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Critical Warning:</strong> Restoring data performs a "Merge" operation. Existing records with matching IDs will be updated. New records will be created. This action cannot be undone.
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & Drop JSON file here or click to browse</p>
+                    <input type="file" id="restoreFile" class="file-input" accept=".json">
+                </div>
+
+                <div id="fileInfo" style="display: none; margin-top: 20px; text-align: center;">
+                    <p style="font-weight: 600; margin-bottom: 10px;">Selected: <span id="fileName"></span></p>
+                    <button class="btn btn-warning" onclick="startRestore()">
+                        <i class="fas fa-history"></i> Confirm Restore
+                    </button>
+                </div>
+
+                <div class="progress-container" id="restoreProgress">
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+                    <div class="progress-text">Restoring data...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, writeBatch, Timestamp, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                if (!uSnap.exists() || (uSnap.data().role !== 'admin' && !uSnap.data().isAdmin)) {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // --- BACKUP LOGIC ---
+        window.startBackup = async (type) => {
+            const container = document.getElementById('backupProgress');
+            const fill = container.querySelector('.progress-fill');
+            const text = container.querySelector('.progress-text');
+            
+            container.style.display = 'block';
+            fill.style.width = '5%';
+            text.innerText = 'Fetching collections...';
+
+            try {
+                const collections = type === 'full' 
+                    ? ['users', 'appointments', 'vehicles', 'services', 'blogs', 'notifications', 'notifications_system'] 
+                    : [type];
+                
+                const backupData = {};
+
+                for (let i = 0; i < collections.length; i++) {
+                    const colName = collections[i];
+                    text.innerText = `Backing up ${colName}...`;
+                    
+                    try {
+                        const snap = await getDocs(collection(db, colName));
+                        backupData[colName] = [];
+                        
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            // Transform FS Timestamp objects to ISO Strings for JSON
+                            const cleanData = {};
+                            for (const [key, value] of Object.entries(data)) {
+                                if (value && typeof value.toDate === 'function') {
+                                    cleanData[key] = value.toDate().toISOString(); // Mark as date
+                                } else {
+                                    cleanData[key] = value;
+                                }
+                            }
+                            backupData[colName].push({ id: doc.id, ...cleanData });
+                        });
+                    } catch (colErr) {
+                        console.warn(`Skipping collection ${colName} (might not exist or permission denied)`);
+                    }
+                    
+                    const percent = ((i + 1) / collections.length) * 100;
+                    fill.style.width = `${percent}%`;
+                }
+
+                // Generate Download
+                const dateStr = new Date().toISOString().slice(0,10);
+                const fileName = `TopAutocare_${type}_backup_${dateStr}.json`;
+                const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                showToast('Backup download started', 'success');
+                setTimeout(() => container.style.display = 'none', 2000);
+
+            } catch (e) {
+                console.error(e);
+                showToast('Backup failed: ' + e.message, 'error');
+                container.style.display = 'none';
+            }
+        };
+
+        // --- RESTORE LOGIC ---
+        const fileInput = document.getElementById('restoreFile');
+        const dropZone = document.getElementById('dropZone');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                document.getElementById('fileName').innerText = e.target.files[0].name;
+                document.getElementById('fileInfo').style.display = 'block';
+            }
+        });
+
+        // Drag & Drop styling
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        window.startRestore = async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            if (!confirm('Are you sure you want to restore? This merges data into existing records.')) return;
+
+            const container = document.getElementById('restoreProgress');
+            const fill = container.querySelector('.progress-fill');
+            const text = container.querySelector('.progress-text');
+
+            container.style.display = 'block';
+            fill.style.width = '5%';
+            text.innerText = 'Parsing file...';
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const collections = Object.keys(data);
+                    
+                    // Firestore batch limit is 500 operations. We must chunk writes.
+                    const BATCH_SIZE = 400; 
+                    let batch = writeBatch(db);
+                    let opCount = 0;
+                    let totalOps = 0;
+
+                    // Pre-calculate total items for progress bar
+                    let totalItems = 0;
+                    collections.forEach(c => totalItems += data[c].length);
+
+                    for (const colName of collections) {
+                        text.innerText = `Restoring ${colName}...`;
+                        const items = data[colName];
+                        
+                        for (const item of items) {
+                            const ref = doc(db, colName, item.id);
+                            const docData = { ...item };
+                            delete docData.id; 
+
+                            // Attempt to convert ISO date strings back to Timestamps
+                            for (const [key, val] of Object.entries(docData)) {
+                                // Heuristic check for ISO Date format
+                                if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(val)) {
+                                    const d = new Date(val);
+                                    if (!isNaN(d.getTime())) docData[key] = Timestamp.fromDate(d);
+                                }
+                            }
+
+                            batch.set(ref, docData, { merge: true });
+                            opCount++;
+                            totalOps++;
+
+                            // Update Progress
+                            fill.style.width = `${(totalOps / totalItems) * 100}%`;
+
+                            // Commit batch if limit reached
+                            if (opCount >= BATCH_SIZE) {
+                                await batch.commit();
+                                batch = writeBatch(db); // Start new batch
+                                opCount = 0;
+                            }
+                        }
+                    }
+
+                    // Commit remaining ops
+                    if (opCount > 0) {
+                        await batch.commit();
+                    }
+                    
+                    fill.style.width = '100%';
+                    text.innerText = 'Restore Complete!';
+                    showToast('Restore completed successfully', 'success');
+                    setTimeout(() => {
+                        container.style.display = 'none';
+                        document.getElementById('fileInfo').style.display = 'none';
+                        fileInput.value = '';
+                    }, 2000);
+
+                } catch (err) {
+                    console.error(err);
+                    showToast('Restore failed: Invalid JSON or Network Error', 'error');
+                    container.style.display = 'none';
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // Toast
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        // Sidebar Toggle
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

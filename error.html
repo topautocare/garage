@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Error - Top Autocare</title>
+    <meta name="description" content="An error occurred. Let's get you back on track with Top Autocare.">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Logo */
+        .logo-area { margin-bottom: 30px; }
+        .logo-area img { height: 50px; width: auto; margin-bottom: 10px; }
+        .logo-area h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); }
+        .logo-area span { color: var(--primary-gold); }
+
+        /* Error Card */
+        .error-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-container {
+            width: 100px; height: 100px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 3rem; color: var(--primary-gold);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+        p { color: var(--text-grey); font-size: 1rem; margin-bottom: 30px; line-height: 1.6; }
+
+        .btn-group {
+            display: flex; gap: 15px; justify-content: center;
+        }
+        
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 24px; border-radius: 8px; border: none;
+            font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            transition: var(--transition); text-decoration: none; gap: 8px;
+            flex: 1;
+        }
+
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); transform: translateY(-2px); }
+
+        .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-dark); }
+        .btn-secondary:hover { background: #f8f9fa; border-color: #ced4da; }
+
+        .contact-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-grey);
+        }
+        .contact-info a { color: var(--primary-gold); text-decoration: none; font-weight: 500; }
+        .contact-info a:hover { text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            .btn-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-area">
+        <img src="images/logo.png" alt="Top Autocare" onerror="this.style.display='none'">
+        <h1>Top<span>Autocare</span></h1>
+    </div>
+
+    <div class="error-card">
+        <div class="icon-container">
+            <i class="fas fa-wrench"></i>
+        </div>
+        
+        <h1 id="errorTitle">Something went wrong</h1>
+        <p id="errorMessage">We encountered an unexpected issue. Please try refreshing the page or return home.</p>
+        
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="retry()">
+                <i class="fas fa-sync-alt"></i> Retry
+            </button>
+            <button class="btn btn-primary" onclick="goHome()">
+                <i class="fas fa-home"></i> Dashboard
+            </button>
+        </div>
+
+        <div class="contact-info">
+            <p>Issue persisting? Contact support at <br>
+            <a href="tel:+254757562447">+254 757 562 447</a> or <a href="mailto:support@topautocare.com">support@topautocare.com</a></p>
+        </div>
+    </div>
+
+    <!-- Logic to handle error codes passed via URL -->
+    <script>
+        // Parse Error Code
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorCode = urlParams.get('code');
+
+        const errorData = {
+            '400': { title: 'Bad Request', msg: 'The server cannot process the request due to a client error.' },
+            '401': { title: 'Unauthorized', msg: 'Access is denied. Please sign in to continue.' },
+            '403': { title: 'Forbidden', msg: 'You do not have permission to view this resource.' },
+            '404': { title: 'Page Not Found', msg: 'The page you are looking for does not exist or has been moved.' },
+            '500': { title: 'Server Error', msg: 'Our servers are having trouble. Please try again later.' },
+            'offline': { title: 'No Connection', msg: 'You seem to be offline. Please check your internet connection.' }
+        };
+
+        if (errorCode && errorData[errorCode]) {
+            document.getElementById('errorTitle').textContent = errorData[errorCode].title;
+            document.getElementById('errorMessage').textContent = errorData[errorCode].msg;
+            
+            // Adjust icon for offline mode
+            if(errorCode === 'offline') {
+                document.querySelector('.icon-container i').className = 'fas fa-wifi';
+                document.querySelector('.btn-primary').style.display = 'none'; // Hide home button on offline error
+            }
+
+            // Handle auto-redirects for auth issues
+            if (['401', '403'].includes(errorCode)) {
+                setTimeout(() => window.location.href = 'signin.html', 3000);
+            }
+        } else if (errorCode) {
+             document.getElementById('errorTitle').textContent = `Error ${errorCode}`;
+        }
+
+        function retry() {
+            window.location.reload();
+        }
+        
+        function goHome() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Service Management - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-logout { 
+            width: 100%; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; 
+            border: none; padding: 10px; border-radius: 6px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .btn-logout:hover { background: #dc3545; color: #fff; }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* ---- HEADER ---- */
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+        .page-headline { font-weight: 600; font-size: 1.1rem; color: var(--text-dark); }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        
+        /* Notification Bell */
+        .notification-wrapper { position: relative; cursor: pointer; transition: transform 0.2s; }
+        .notification-wrapper:hover { transform: scale(1.1); }
+        .notification-wrapper i { font-size: 1.3rem; color: var(--text-grey); transition: color 0.3s; }
+        .notification-wrapper:hover i { color: var(--primary-gold); }
+        
+        .badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--danger); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 2px 5px; border-radius: 50%;
+            min-width: 18px; text-align: center;
+            border: 2px solid var(--white);
+            display: none;
+        }
+
+        /* ---- SERVICE PAGE ---- */
+        .page-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
+        }
+        .page-title h1 { font-size: 1.8rem; font-weight: 700; }
+        .page-title p { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* Controls */
+        .controls-container {
+            background: var(--white); padding: 20px; border-radius: 12px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+        }
+        .search-wrapper { position: relative; flex: 1; max-width: 400px; }
+        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-grey); }
+        .search-input {
+            width: 100%; padding: 10px 15px 10px 40px; border-radius: 8px;
+            border: 1px solid var(--border-color); outline: none;
+        }
+        .search-input:focus { border-color: var(--primary-gold); }
+
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; }
+        .btn-primary:hover { background: var(--primary-gold-dark); }
+        .btn-secondary { background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: #e2e6ea; }
+
+        /* Table */
+        .table-card {
+            background: var(--white); border-radius: 12px; overflow: hidden;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+        }
+        .table-responsive { overflow-x: auto; }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        
+        thead { background: var(--bg-light); border-bottom: 1px solid var(--border-color); }
+        th {
+            text-align: left; padding: 15px 20px; font-weight: 600;
+            color: var(--text-dark); font-size: 0.9rem; cursor: pointer;
+        }
+        th:hover { color: var(--primary-gold); }
+        
+        td {
+            padding: 15px 20px; border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark); font-size: 0.95rem; vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #fafafa; }
+
+        .service-cell { display: flex; align-items: center; gap: 12px; }
+        .service-icon {
+            width: 40px; height: 40px; background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        .service-name { font-weight: 600; display: block; }
+        .service-desc { font-size: 0.8rem; color: var(--text-grey); max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .service-price { font-weight: 700; color: var(--primary-gold-dark); }
+
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .status-active { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .status-inactive { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+
+        .action-btn {
+            width: 32px; height: 32px; border-radius: 6px; border: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; margin-right: 5px; transition: var(--transition);
+        }
+        .btn-edit { background: rgba(255, 193, 7, 0.1); color: #d39e00; }
+        .btn-edit:hover { background: #ffc107; color: #000; }
+        .btn-delete { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .btn-delete:hover { background: var(--danger); color: #fff; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fff; margin: 5% auto; padding: 30px;
+            border-radius: 12px; width: 90%; max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative;
+        }
+        .close-modal {
+            position: absolute; top: 20px; right: 20px; font-size: 1.5rem;
+            cursor: pointer; color: var(--text-grey);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-dark); }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; outline: none; font-family: inherit;
+        }
+        .form-control:focus { border-color: var(--primary-gold); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 3000; }
+        .toast {
+            padding: 15px 25px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html" class="active"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="page-headline">Service Management</div>
+            </div>
+
+            <div class="header-right">
+                <!-- Notification Bell -->
+                <div class="notification-wrapper" onclick="window.location.href='admin-notifications.html'" title="View Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="headerNotifBadge">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Garage Services</h1>
+                    <p>Manage pricing, descriptions, and availability of services.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('add')">
+                    <i class="fas fa-plus"></i> Add New Service
+                </button>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-container">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search services...">
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-grey);" id="totalCount">Loading...</div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('name')">Service Name <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable('price')">Price (KES) <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable('duration')">Duration <i class="fas fa-sort"></i></th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicesTable">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading services...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Add Service</h2>
+            
+            <form id="serviceForm">
+                <div class="form-group">
+                    <label class="form-label">Service Name</label>
+                    <input type="text" id="sName" class="form-control" required placeholder="e.g. Oil Change">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Price (KES)</label>
+                        <input type="number" id="sPrice" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Duration (Hours)</label>
+                        <input type="number" id="sDuration" class="form-control" step="0.5" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Icon (FontAwesome)</label>
+                    <select id="sIcon" class="form-control">
+                        <option value="fa-wrench">🔧 Wrench (General)</option>
+                        <option value="fa-oil-can">🛢️ Oil Can</option>
+                        <option value="fa-car-battery">🔋 Battery</option>
+                        <option value="fa-cog">⚙️ Engine/Cog</option>
+                        <option value="fa-snowflake">❄️ AC/Cooling</option>
+                        <option value="fa-spray-can">🖌️ Paint/Body</option>
+                        <option value="fa-car">🚗 Car</option>
+                        <option value="fa-tools">🛠️ Tools</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="sDesc" class="form-control" rows="3" placeholder="Brief details..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="sActive" checked style="width: 18px; height: 18px;">
+                        <span style="font-weight: 500;">Active</span>
+                    </label>
+                </div>
+
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()" style="margin-right: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, orderBy, onSnapshot, 
+            doc, addDoc, updateDoc, deleteDoc, getDoc, serverTimestamp, where, enableIndexedDbPersistence
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let allServices = [];
+        let editId = null;
+        let unsubscribe = null;
+        let currentSort = { col: 'name', dir: 'asc' };
+
+        const notifBadge = document.getElementById('headerNotifBadge');
+
+        // Auth & Init
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                if(uSnap.exists() && (uSnap.data().role === 'admin' || uSnap.data().isAdmin)) {
+                    listenForNotifications();
+                    loadServices();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Notifications
+        function listenForNotifications() {
+            const q = query(collection(db, 'notifications'), where('read', '==', false));
+            onSnapshot(q, (snap) => {
+                const count = snap.size;
+                if(count > 0) {
+                    notifBadge.style.display = 'block';
+                    notifBadge.innerText = count > 99 ? '99+' : count;
+                } else {
+                    notifBadge.style.display = 'none';
+                }
+            });
+        }
+
+        // Load Data
+        function loadServices() {
+            if(unsubscribe) unsubscribe();
+            const q = query(collection(db, 'services'), orderBy('name', 'asc'));
+            
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                allServices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                applyFilters();
+            });
+        }
+
+        // Filter & Render
+        function applyFilters() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = allServices.filter(s => 
+                (s.name || '').toLowerCase().includes(term) || 
+                (s.description || '').toLowerCase().includes(term)
+            );
+
+            // Sort
+            filtered.sort((a, b) => {
+                let valA = a[currentSort.col];
+                let valB = b[currentSort.col];
+                
+                if(typeof valA === 'string') {
+                    valA = valA.toLowerCase(); valB = valB.toLowerCase();
+                }
+                
+                if (valA < valB) return currentSort.dir === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.dir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable(filtered);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('servicesTable');
+            document.getElementById('totalCount').innerText = `${data.length} Services`;
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px;">No services found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(s => {
+                const statusClass = s.status === 'active' ? 'status-active' : 'status-inactive';
+                const statusText = s.status === 'active' ? 'Active' : 'Inactive';
+                const price = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(s.price || 0);
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="service-cell">
+                                <div class="service-icon"><i class="fas ${s.icon || 'fa-wrench'}"></i></div>
+                                <div>
+                                    <span class="service-name">${s.name}</span>
+                                    <span class="service-desc">${s.description || ''}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="service-price">${price}</td>
+                        <td>${s.duration ? s.duration + ' hrs' : '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="openModal('edit', '${s.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteService('${s.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Modal Logic
+        window.openModal = (mode, id) => {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('serviceForm');
+            
+            if(mode === 'add') {
+                title.innerText = 'Add New Service';
+                editId = null;
+                form.reset();
+            } else {
+                title.innerText = 'Edit Service';
+                editId = id;
+                const svc = allServices.find(s => s.id === id);
+                if(svc) {
+                    document.getElementById('sName').value = svc.name;
+                    document.getElementById('sPrice').value = svc.price;
+                    document.getElementById('sDuration').value = svc.duration || '';
+                    document.getElementById('sIcon').value = svc.icon || 'fa-wrench';
+                    document.getElementById('sDesc').value = svc.description || '';
+                    document.getElementById('sActive').checked = (svc.status === 'active');
+                }
+            }
+            modal.style.display = 'block';
+        };
+
+        window.closeModal = () => {
+            document.getElementById('serviceModal').style.display = 'none';
+        };
+
+        // Form Submit
+        document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('sName').value.trim(),
+                price: Number(document.getElementById('sPrice').value),
+                duration: Number(document.getElementById('sDuration').value) || 0,
+                icon: document.getElementById('sIcon').value,
+                description: document.getElementById('sDesc').value.trim(),
+                status: document.getElementById('sActive').checked ? 'active' : 'inactive',
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if(editId) {
+                    await updateDoc(doc(db, 'services', editId), data);
+                    showToast('Service updated', 'success');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'services'), data);
+                    showToast('Service created', 'success');
+                }
+                closeModal();
+            } catch(err) {
+                console.error(err);
+                showToast('Error saving service', 'error');
+            }
+        });
+
+        // Delete
+        window.deleteService = async (id) => {
+            if(!confirm('Delete this service permanently?')) return;
+            try {
+                await deleteDoc(doc(db, 'services', id));
+                showToast('Service deleted', 'success');
+            } catch(e) {
+                showToast('Error deleting', 'error');
+            }
+        };
+
+        // Search & Sort Listener
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        
+        window.sortTable = (col) => {
+            if(currentSort.col === col) {
+                currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.col = col;
+                currentSort.dir = 'asc';
+            }
+            applyFilters();
+        };
+
+        // UI Helpers
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
+            if(type === 'error') t.style.borderLeftColor = 'var(--danger)';
+            else if(type === 'success') t.style.borderLeftColor = 'var(--success)';
+            container.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                if(unsubscribe) unsubscribe();
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        window.onclick = (event) => {
+            const modal = document.getElementById('serviceModal');
+            if (event.target == modal) closeModal();
+        };
+    </script>
+    
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

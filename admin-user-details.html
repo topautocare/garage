@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>User Details - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: #fff;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 1000; transition: var(--transition);
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img { height: 35px; margin-right: 10px; }
+        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+
+        .sidebar-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 15px 25px;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.95rem; transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.05); color: #fff;
+            border-left-color: var(--primary-gold);
+        }
+        .sidebar-menu i { width: 25px; font-size: 1.1rem; }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-logout { 
+            width: 100%; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; 
+            border: none; padding: 10px; border-radius: 6px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .btn-logout:hover { background: #dc3545; color: #fff; }
+
+        /* ---- MAIN CONTENT ---- */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* ---- HEADER ---- */
+        .top-header {
+            height: var(--header-height); background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; position: sticky; top: 0; z-index: 900;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-dark); }
+        .page-headline { display: flex; flex-direction: column; }
+        .page-title { font-weight: 600; font-size: 1.1rem; color: var(--text-dark); }
+        .back-link { font-size: 0.85rem; color: var(--text-grey); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.3s; }
+        .back-link:hover { color: var(--primary-gold); }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        
+        /* Notification Bell */
+        .notification-wrapper { position: relative; cursor: pointer; transition: transform 0.2s; }
+        .notification-wrapper:hover { transform: scale(1.1); }
+        .notification-wrapper i { font-size: 1.3rem; color: var(--text-grey); transition: color 0.3s; }
+        .notification-wrapper:hover i { color: var(--primary-gold); }
+        
+        .badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--danger); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 2px 5px; border-radius: 50%;
+            min-width: 18px; text-align: center;
+            border: 2px solid var(--white);
+            display: none;
+        }
+
+        /* ---- USER DETAILS PAGE ---- */
+        .page-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        .grid-layout {
+            display: grid; grid-template-columns: 350px 1fr; gap: 30px;
+            display: none; /* Hidden until loaded */
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white); border-radius: 12px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            margin-bottom: 30px; overflow: hidden;
+        }
+        .card-header {
+            padding: 20px 25px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fcfcfc;
+        }
+        .card-header h3 { font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-dark); }
+        .card-body { padding: 25px; }
+
+        /* Profile Card */
+        .profile-header { text-align: center; margin-bottom: 25px; }
+        .avatar-lg {
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--primary-gold); padding: 3px; background: #fff;
+            margin: 0 auto 15px; display: block;
+        }
+        .avatar-placeholder {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--bg-light); color: var(--primary-gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; margin: 0 auto 15px; border: 3px solid var(--border-color);
+        }
+        .profile-name { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
+        .profile-email { color: var(--text-grey); font-size: 0.9rem; margin-bottom: 15px; display: block; }
+
+        .role-badge {
+            display: inline-block; padding: 5px 12px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .role-admin { background: rgba(111, 66, 193, 0.1); color: #6f42c1; }
+        .role-user { background: rgba(23, 162, 184, 0.1); color: var(--info); }
+        .role-mechanic { background: rgba(255, 193, 7, 0.1); color: #d39e00; }
+
+        .info-list { list-style: none; margin-top: 20px; }
+        .info-list li {
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        .info-list li:last-child { border-bottom: none; }
+        .info-label { color: var(--text-grey); font-weight: 500; }
+        .info-value { color: var(--text-dark); font-weight: 600; }
+
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary-gold); color: #fff; width: 100%; }
+        .btn-primary:hover { background: var(--primary-gold-dark); }
+        
+        /* Activity Lists */
+        .activity-item {
+            display: flex; align-items: center; padding: 15px;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            margin-bottom: 15px; transition: var(--transition); cursor: context-menu;
+        }
+        .activity-item:hover { background: #fafafa; border-color: var(--primary-gold); }
+        
+        .activity-icon {
+            width: 45px; height: 45px; border-radius: 8px;
+            background: rgba(212, 175, 55, 0.1); color: var(--primary-gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-right: 15px; flex-shrink: 0;
+        }
+        .activity-info { flex: 1; }
+        .activity-title { font-weight: 600; font-size: 1rem; color: var(--text-dark); margin-bottom: 2px; display: block;}
+        .activity-meta { font-size: 0.85rem; color: var(--text-grey); }
+        .activity-status { font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: var(--bg-light); }
+
+        /* Loading Skeleton */
+        .loading-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 400px; text-align: center; color: var(--text-grey);
+        }
+        .loading-screen i { font-size: 3rem; margin-bottom: 20px; color: var(--primary-gold); }
+
+        /* Edit Modal */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #fff; padding: 30px; border-radius: 12px;
+            width: 90%; max-width: 500px; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .close-modal {
+            position: absolute; top: 20px; right: 20px; font-size: 1.5rem;
+            cursor: pointer; color: var(--text-grey);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; outline: none; font-family: inherit;
+        }
+        .form-control:focus { border-color: var(--primary-gold); }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 3000; }
+        .toast {
+            padding: 15px 25px; background: #fff; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 10px;
+            border-left: 4px solid var(--primary-gold); transform: translateX(120%);
+            transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 992px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 999; display: none;
+            }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="images/logo.png" alt="Logo">
+            <h2>Top Autocare</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin-users.html" class="active"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="admin-services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="admin-vehicles.html"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="admin-blog.html"><i class="fas fa-newspaper"></i> Blog Management</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> Admin Profile</a></li>
+                <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="admin-faq.html"><i class="fas fa-question-circle"></i> FAQ Management</a></li>
+                <li><a href="admin-analytics.html"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li><a href="admin-backup.html"><i class="fas fa-database"></i> Backup & Restore</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Site</a></li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="page-headline">
+                    <div class="page-title">User Details</div>
+                    <a href="admin-users.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Users</a>
+                </div>
+            </div>
+
+            <div class="header-right">
+                 <!-- Notification Bell -->
+                 <div class="notification-wrapper" onclick="window.location.href='admin-notifications.html'" title="View Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="headerNotifBadge">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-container">
+            
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-screen">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <h3>Fetching User Data...</h3>
+            </div>
+
+            <div id="contentGrid" class="grid-layout">
+                <!-- Left Column: Profile -->
+                <div class="left-column">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="profile-header">
+                                <div id="userAvatarContainer">
+                                    <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                                </div>
+                                <h2 class="profile-name" id="userName">Loading...</h2>
+                                <span class="profile-email" id="userEmail">...</span>
+                                <span id="userRoleBadge" class="role-badge role-user">USER</span>
+                            </div>
+
+                            <ul class="info-list">
+                                <li>
+                                    <span class="info-label">Phone</span>
+                                    <span class="info-value" id="userPhone">-</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Status</span>
+                                    <span class="info-value" id="userStatus">Active</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Joined</span>
+                                    <span class="info-value" id="userJoined">-</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Last Login</span>
+                                    <span class="info-value" id="userLogin">-</span>
+                                </li>
+                            </ul>
+
+                            <div style="margin-top: 25px;">
+                                <button class="btn btn-primary" onclick="openEditModal()">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Activity -->
+                <div class="right-column">
+                    
+                    <!-- Vehicles -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-car" style="color: var(--primary-gold); margin-right: 8px;"></i> Registered Vehicles</h3>
+                        </div>
+                        <div class="card-body" id="vehiclesContainer">
+                            <p style="color: var(--text-grey);">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Appointments -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-check" style="color: var(--primary-gold); margin-right: 8px;"></i> Appointment History</h3>
+                        </div>
+                        <div class="card-body" id="appointmentsContainer">
+                            <p style="color: var(--text-grey);">Loading...</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="margin-bottom: 20px;">Edit User</h2>
+            <form id="editUserForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="editName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" id="editPhone" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select id="editRole" class="form-control">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="mechanic">Mechanic</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="editActive" style="width: 18px; height: 18px;">
+                    <label for="editActive" style="margin: 0; font-weight: 500;">Account Visible / Active</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, doc, getDoc, updateDoc, collection, 
+            query, where, orderBy, onSnapshot, serverTimestamp, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open.');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser.');
+            }
+        });
+
+        let targetUserId = new URLSearchParams(window.location.search).get('id');
+        let userData = null;
+
+        const notifBadge = document.getElementById('headerNotifBadge');
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const adminCheck = await getDoc(doc(db, 'users', user.uid));
+                if(adminCheck.exists() && (adminCheck.data().role === 'admin' || adminCheck.data().isAdmin)) {
+                    if(!targetUserId) {
+                        window.location.href = 'admin-users.html';
+                    } else {
+                        listenForNotifications();
+                        loadUser();
+                        loadVehicles();
+                        loadAppointments();
+                    }
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Notifications
+        function listenForNotifications() {
+            const q = query(collection(db, 'notifications'), where('read', '==', false));
+            onSnapshot(q, (snap) => {
+                const count = snap.size;
+                notifBadge.style.display = count > 0 ? 'block' : 'none';
+                notifBadge.innerText = count > 99 ? '99+' : count;
+            });
+        }
+
+        // Load User
+        function loadUser() {
+            onSnapshot(doc(db, 'users', targetUserId), (snap) => {
+                if(snap.exists()) {
+                    userData = snap.data();
+                    renderUser(userData);
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('contentGrid').style.display = 'grid';
+                } else {
+                    alert('User not found');
+                    window.location.href = 'admin-users.html';
+                }
+            });
+        }
+
+        // Render User Data
+        function renderUser(data) {
+            document.getElementById('userName').innerText = data.fullName || data.displayName || 'Unknown';
+            document.getElementById('userEmail').innerText = data.email || 'No Email';
+            document.getElementById('userPhone').innerText = data.phone || '-';
+            
+            // Status
+            const isActive = data.active !== false; // Default active if undefined
+            const statusEl = document.getElementById('userStatus');
+            statusEl.innerText = isActive ? 'Active' : 'Inactive';
+            statusEl.style.color = isActive ? 'var(--success)' : 'var(--danger)';
+
+            // Avatar
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            if(data.photoURL) {
+                avatarContainer.innerHTML = `<img src="${data.photoURL}" class="avatar-lg">`;
+            } else {
+                avatarContainer.innerHTML = `<div class="avatar-placeholder"><i class="fas fa-user"></i></div>`;
+            }
+
+            // Role Badge
+            const roleEl = document.getElementById('userRoleBadge');
+            const role = (data.role || 'user').toLowerCase();
+            roleEl.innerText = role.toUpperCase();
+            roleEl.className = `role-badge role-${role}`;
+
+            // Dates
+            const joined = (data.createdAt && typeof data.createdAt.toDate === 'function') 
+                        ? new Date(data.createdAt.toDate()).toLocaleDateString() 
+                        : (data.createdAt ? new Date(data.createdAt).toLocaleDateString() : '-');
+
+            const login = (data.lastLogin && typeof data.lastLogin.toDate === 'function') 
+                        ? new Date(data.lastLogin.toDate()).toLocaleString() 
+                        : (data.lastLogin ? new Date(data.lastLogin).toLocaleString() : 'Never');
+
+            document.getElementById('userJoined').innerText = joined;
+            document.getElementById('userLogin').innerText = login;
+        }
+
+        // Load Vehicles
+        function loadVehicles() {
+            const q = query(collection(db, 'vehicles'), where('userId', '==', targetUserId));
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('vehiclesContainer');
+                if(snap.empty) {
+                    container.innerHTML = `<div style="color:var(--text-grey); font-style:italic;">No vehicles registered.</div>`;
+                    return;
+                }
+
+                container.innerHTML = snap.docs.map(doc => {
+                    const v = doc.data();
+                    return `
+                        <div class="activity-item">
+                            <div class="activity-icon"><i class="fas fa-car"></i></div>
+                            <div class="activity-info">
+                                <span class="activity-title">${v.make} ${v.model} (${v.year})</span>
+                                <span class="activity-meta">Plate: ${v.licensePlate || v.plate || 'N/A'} • VIN: ${v.vin || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            });
+        }
+
+        // Load Appointments
+        function loadAppointments() {
+            const q = query(collection(db, 'appointments'), where('userId', '==', targetUserId), orderBy('date', 'desc'));
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('appointmentsContainer');
+                if(snap.empty) {
+                    container.innerHTML = `<div style="color:var(--text-grey); font-style:italic;">No appointment history.</div>`;
+                    return;
+                }
+
+                container.innerHTML = snap.docs.map(doc => {
+                    const a = doc.data();
+                    const date = (a.date && typeof a.date.toDate === 'function') 
+                                ? new Date(a.date.toDate()).toLocaleDateString() 
+                                : (a.date ? new Date(a.date).toLocaleDateString() : 'TBD');
+                    
+                    return `
+                        <div class="activity-item" onclick="window.location.href='admin-appointment-details.html?id=${doc.id}'" style="cursor:pointer;">
+                            <div class="activity-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="activity-info">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span class="activity-title">${a.service}</span>
+                                    <span class="activity-status">${(a.status || '').toUpperCase()}</span>
+                                </div>
+                                <span class="activity-meta">${date} at ${a.time || '-'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            });
+        }
+
+        // Edit Modal Functions
+        window.openEditModal = () => {
+            if(!userData) return;
+            document.getElementById('editName').value = userData.fullName || userData.displayName || '';
+            document.getElementById('editPhone').value = userData.phone || '';
+            document.getElementById('editRole').value = userData.role || 'user';
+            document.getElementById('editActive').checked = userData.active !== false; // Default true
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('editModal').classList.remove('active');
+        };
+
+        // Save User
+        document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true; btn.innerText = 'Saving...';
+
+            const updates = {
+                fullName: document.getElementById('editName').value,
+                phone: document.getElementById('editPhone').value,
+                role: document.getElementById('editRole').value,
+                active: document.getElementById('editActive').checked,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                await updateDoc(doc(db, 'users', targetUserId), updates);
+                showToast('User updated successfully', 'success');
+                closeModal();
+            } catch(err) {
+                console.error(err);
+                showToast('Error updating user', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Save Changes';
+            }
+        });
+
+        // UI Helpers
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
+            if(type === 'error') t.style.borderLeftColor = 'var(--danger)';
+            else if(type === 'success') t.style.borderLeftColor = 'var(--success)';
+            container.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        };
+
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+</body>
+</html>

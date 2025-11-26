@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dashboard - Top Autocare</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Mobile Optimization -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/images/app-icon-192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/images/app-icon-192.png">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b8962e;
+            --text-dark: #1a1a1a;
+            --text-grey: #6c757d;
+            --bg-light: #f4f6f9;
+            --white: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 100px; /* Space for bottom nav */
+            min-height: 100vh;
+        }
+
+        /* Header */
+        #header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0;
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1001;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+        #header.hidden { transform: translateY(-100%); }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 0 1.5rem;
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .logo-container img { height: 40px; width: auto; margin-right: 0.75rem; }
+        .logo-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .logo-title span { color: var(--primary-gold); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-right: 1.5rem;
+        }
+
+        /* Notification Styles */
+        .notification-bell {
+            position: relative;
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .notification-bell:hover { background: #f8f9fa; color: var(--primary-gold); }
+        
+        .notification-badge {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: var(--danger);
+            color: #fff;
+            border-radius: 50%;
+            width: 16px; height: 16px;
+            font-size: 0.65rem;
+            display: none; /* Hidden by default, toggled by JS */
+            align-items: center; justify-content: center;
+            font-weight: 700;
+            border: 2px solid #fff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: none;
+        }
+
+        @media(min-width: 769px) { .menu-toggle { display: block; } }
+
+        /* Main Layout */
+        .container {
+            max-width: 1100px;
+            margin: 90px auto 0;
+            padding: 0 20px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            margin-bottom: 30px;
+        }
+        .welcome-title { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
+        .welcome-subtitle { color: var(--text-grey); font-size: 0.95rem; }
+        .welcome-subtitle i { color: var(--primary-gold); margin-right: 5px; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary-gold); }
+        
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-info h3 { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); line-height: 1; }
+        .stat-info p { font-size: 0.85rem; color: var(--text-grey); margin-top: 5px; font-weight: 500; }
+
+        /* Content Split */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        @media(max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
+
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
+        }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+        .section-link { font-size: 0.85rem; color: var(--primary-gold-dark); text-decoration: none; font-weight: 600; }
+
+        /* Action Cards */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .action-card:hover {
+            background: var(--primary-gold);
+            transform: translateY(-3px);
+            border-color: var(--primary-gold);
+        }
+        .action-card i { font-size: 1.8rem; color: var(--primary-gold); margin-bottom: 10px; transition: var(--transition); }
+        .action-card h4 { font-size: 0.9rem; color: var(--text-dark); font-weight: 600; transition: var(--transition); }
+        
+        .action-card:hover i, .action-card:hover h4 { color: #fff; }
+
+        /* Appointments List */
+        .appointment-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-gold);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .appointment-card:hover { transform: translateX(5px); box-shadow: var(--shadow-md); }
+
+        .apt-details h4 { font-size: 1rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .apt-details p { font-size: 0.85rem; color: var(--text-grey); display: flex; align-items: center; gap: 6px; }
+        .apt-details p i { color: var(--primary-gold); font-size: 0.8rem; }
+
+        .apt-status {
+            padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d1e7dd; color: #0f5132; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        /* Sidebar (Desktop) */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0, 0, 0, 0.5); z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        .sidebar {
+            position: fixed; top: 0; right: -300px;
+            width: 280px; height: 100vh;
+            background: var(--white); padding: 25px;
+            transition: right 0.3s ease; z-index: 2001;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+        .sidebar.active { right: 0; }
+
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+        .close-sidebar { background: #f1f1f1; border: none; color: var(--text-dark); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+
+        .sidebar-menu { list-style: none; flex: 1; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; padding: 12px 15px;
+            color: var(--text-grey); text-decoration: none;
+            border-radius: 8px; font-weight: 500; transition: var(--transition);
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(212, 175, 55, 0.1); color: var(--primary-gold-dark);
+        }
+        .sidebar-menu i { width: 25px; }
+
+        .signout-btn {
+            background: #ffebee; color: var(--danger); border: none;
+            padding: 12px; border-radius: 8px; width: 100%;
+            font-weight: 600; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+            transition: var(--transition); margin-top: 20px;
+        }
+        .signout-btn:hover { background: var(--danger); color: #fff; }
+
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 30px; border-radius: 50px;
+            z-index: 999; box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .nav-item {
+            text-decoration: none; color: #999;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 0.75rem; transition: var(--transition);
+        }
+        .nav-item i { font-size: 1.3rem; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary-gold); }
+        .nav-item.active i { transform: translateY(-2px); }
+        .nav-item:hover { color: var(--primary-gold-dark); }
+
+        @media(min-width: 769px) { .bottom-nav { display: none; } }
+
+        /* Utilities */
+        .loading-spinner { color: var(--primary-gold); font-size: 2rem; }
+        .empty-state { text-align: center; padding: 30px; color: var(--text-grey); background: var(--white); border-radius: 12px; border: 1px dashed var(--border-color); }
+        
+        .error-box {
+             background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; 
+             border: 1px solid #ffeeba; font-size: 0.85rem; text-align: center; margin-top: 10px;
+        }
+
+        /* Offline Notification */
+        .offline-badge {
+            position: fixed; bottom: 90px; right: 20px;
+            background: var(--danger); color: #fff; padding: 8px 16px;
+            border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000;
+            display: none; align-items: center; gap: 6px;
+        }
+        .offline-badge.show { display: flex; animation: fadeIn 0.3s; }
+
+        @media(min-width: 769px) { .offline-badge { bottom: 30px; } }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header id="header">
+        <a href="dashboard.html" class="logo-container">
+            <img src="images/logo.png" alt="Top Autocare" onerror="this.style.display='none'">
+            <h1 class="logo-title">Top<span>Autocare</span></h1>
+        </a>
+        
+        <div class="header-actions">
+            <!-- Notification Bell with Badge -->
+            <div class="notification-bell" onclick="window.location.href='notifications.html'">
+                <i class="far fa-bell"></i>
+                <span class="notification-badge">0</span>
+            </div>
+            
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()">
+        <div class="sidebar" onclick="event.stopPropagation()">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Menu</h2>
+                <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="myvehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                <li><a href="book-appointment.html"><i class="fas fa-calendar-plus"></i> Book Service</a></li>
+                <li><a href="services.html"><i class="fas fa-wrench"></i> Services</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+            <button class="signout-btn" onclick="signOut()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="container">
+        <!-- Welcome -->
+        <div class="welcome-section">
+            <h1 class="welcome-title" id="welcomeTitle">Welcome Back</h1>
+            <p class="welcome-subtitle" id="welcomeSubtitle"><i class="fas fa-sun"></i> Access your vehicle history & appointments</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-car"></i></div>
+                <div class="stat-info">
+                    <h3 id="statsVehicles">0</h3>
+                    <p>My Vehicles</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3 id="statsActiveJobs">0</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                    <h3 id="statsServicesDone">0</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="stat-info">
+                    <h3 id="statsUpcoming">0</h3>
+                    <p>Upcoming</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Left Column: Quick Actions -->
+            <div>
+                <div class="section-header">
+                    <div class="section-title">Quick Actions</div>
+                </div>
+                <div class="quick-actions-grid">
+                    <a href="book-appointment.html" class="action-card">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h4>Book Service</h4>
+                    </a>
+                    <a href="myvehicles.html" class="action-card">
+                        <i class="fas fa-car"></i>
+                        <h4>Vehicles</h4>
+                    </a>
+                    <a href="services.html" class="action-card">
+                        <i class="fas fa-wrench"></i>
+                        <h4>Services</h4>
+                    </a>
+                    <a href="profile.html" class="action-card">
+                        <i class="fas fa-user-cog"></i>
+                        <h4>Profile</h4>
+                    </a>
+                </div>
+
+                <div class="section-header" style="margin-top: 30px;">
+                    <div class="section-title">Recent Activity</div>
+                </div>
+                <div id="recentActivity">
+                    <div style="text-align: center; padding: 20px;"><i class="fas fa-circle-notch fa-spin loading-spinner"></i></div>
+                </div>
+            </div>
+
+            <!-- Right Column: Upcoming Appointments -->
+            <div>
+                <div class="section-header">
+                    <div class="section-title">Upcoming</div>
+                    <a href="book-appointment.html" class="section-link">View All</a>
+                </div>
+                <div id="appointmentsContainer">
+                    <div style="text-align: center; padding: 20px;"><i class="fas fa-circle-notch fa-spin loading-spinner"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="myvehicles.html" class="nav-item">
+            <i class="fas fa-car"></i>
+            <span>Vehicles</span>
+        </a>
+        <a href="book-appointment.html" class="nav-item">
+            <i class="fas fa-calendar-plus"></i>
+            <span>Book</span>
+        </a>
+        <a href="services.html" class="nav-item">
+            <i class="fas fa-wrench"></i>
+            <span>Services</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
+
+    <!-- Offline Badge -->
+    <div id="offlineBadge" class="offline-badge">
+        <i class="fas fa-wifi-slash"></i> You are offline
+    </div>
+
+    <!-- Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, query, where, onSnapshot, orderBy, limit, enableIndexedDbPersistence 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkVYS0CaKe1kHPp9GVnURiZz5WP5tE3iM",
+            authDomain: "top-autocare.firebaseapp.com",
+            projectId: "top-autocare",
+            storageBucket: "top-autocare.firebasestorage.app",
+            messagingSenderId: "879247821822",
+            appId: "1:879247821822:web:e6a418395d52aac99a4eaf",
+            measurementId: "G-T5NDM5M33Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Enable Offline Persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            console.log('Persistence offline');
+        });
+
+        let currentUser = null;
+        let unsubscribeAppointments = null;
+        let unsubscribeVehicles = null;
+        let unsubscribeNotifications = null;
+
+        // Sidebar Toggle
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            document.querySelector('.sidebar').classList.toggle('active');
+        };
+
+        // Sign Out
+        window.signOut = async () => {
+            if(confirm('Sign out?')) {
+                await signOut(auth);
+                window.location.href = 'signin.html';
+            }
+        };
+
+        // Greeting Logic
+        function updateWelcome(user) {
+            const hr = new Date().getHours();
+            let greet = 'Good Morning';
+            let icon = 'fa-sun';
+            if(hr >= 12) { greet = 'Good Afternoon'; icon = 'fa-cloud-sun'; }
+            if(hr >= 18) { greet = 'Good Evening'; icon = 'fa-moon'; }
+
+            const name = user.displayName ? user.displayName.split(' ')[0] : 'User';
+            document.getElementById('welcomeTitle').textContent = `${greet}, ${name}`;
+            document.getElementById('welcomeSubtitle').innerHTML = `<i class="fas ${icon}"></i> Here is what's happening with your garage.`;
+        }
+
+        // Robust Date Formatter
+        function formatDate(rawProps) {
+            const raw = rawProps?.timestamp || rawProps?.date || rawProps;
+            if (!raw) return 'TBD';
+            
+            let date;
+            if (raw.toDate) {
+                date = raw.toDate();
+            } else {
+                date = new Date(raw);
+            }
+
+            if (isNaN(date.getTime())) return 'TBD';
+
+            return date.toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+            });
+        }
+
+        // Main Loader
+        function loadDashboard() {
+            if (!currentUser) return;
+
+            // 1. Vehicles Stats
+            const vQ = query(collection(db, 'vehicles'), where('userId', '==', currentUser.uid));
+            unsubscribeVehicles = onSnapshot(vQ, snap => {
+                document.getElementById('statsVehicles').textContent = snap.size;
+            });
+
+            // 2. Appointments & Stats (Client-side Sorting - No Index Issues)
+            const aQ = query(collection(db, 'appointments'), where('userId', '==', currentUser.uid));
+            
+            unsubscribeAppointments = onSnapshot(aQ, (snap) => {
+                let pending = 0, completed = 0, upcoming = 0;
+                
+                // Map docs to data array
+                const allApps = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Process stats
+                allApps.forEach(d => {
+                    if(d.status === 'pending') pending++;
+                    if(d.status === 'completed') completed++;
+                    if(['pending','approved'].includes(d.status)) upcoming++;
+                });
+
+                // Update Stats in UI
+                document.getElementById('statsActiveJobs').textContent = pending;
+                document.getElementById('statsServicesDone').textContent = completed;
+                document.getElementById('statsUpcoming').textContent = upcoming;
+
+                // Client Side Sorting (Newest first)
+                allApps.sort((a, b) => {
+                    const tA = a.timestamp || a.date || 0;
+                    const tB = b.timestamp || b.date || 0;
+                    const valA = tA.toMillis ? tA.toMillis() : new Date(tA).getTime();
+                    const valB = tB.toMillis ? tB.toMillis() : new Date(tB).getTime();
+                    return valB - valA; 
+                });
+
+                // Render Lists
+                const upcomingList = allApps.filter(a => ['pending', 'approved'].includes(a.status)).slice(0, 3);
+                renderAppointments(upcomingList);
+
+                const activityList = allApps.slice(0, 5);
+                renderActivity(activityList);
+
+            }, (error) => {
+                console.error("Error fetching appointments:", error);
+                document.getElementById('appointmentsContainer').innerHTML = 
+                    `<div class="error-box">Unable to load data.</div>`;
+            });
+
+            // 3. Notifications Badge (Logic Activated)
+            // Counts unread notifications ('read' == false)
+            const nQ = query(
+                collection(db, 'notifications'), 
+                where('userId', '==', currentUser.uid), 
+                where('read', '==', false)
+            );
+            
+            unsubscribeNotifications = onSnapshot(nQ, snap => {
+                const badge = document.querySelector('.notification-badge');
+                if(badge) {
+                    const count = snap.size;
+                    if (count > 0) {
+                        badge.textContent = count > 9 ? '9+' : count;
+                        badge.style.display = 'flex'; // Show badge
+                    } else {
+                        badge.style.display = 'none'; // Hide badge
+                    }
+                }
+            });
+        }
+
+        function renderAppointments(list) {
+            const container = document.getElementById('appointmentsContainer');
+            if(list.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-check" style="font-size:2rem; margin-bottom:10px; display:block;"></i>No upcoming appointments.</div>`;
+                return;
+            }
+            container.innerHTML = list.map(a => `
+                <div class="appointment-card" onclick="window.location.href='appointment-details.html?id=${a.id}'" style="cursor:pointer;">
+                    <div class="apt-details">
+                        <h4>${a.service || 'Service'}</h4>
+                        <p><i class="far fa-calendar"></i> ${formatDate(a)} &bull; ${a.time || 'Flexible'}</p>
+                    </div>
+                    <span class="apt-status status-${a.status ? a.status.toLowerCase() : 'pending'}">${a.status || 'Pending'}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderActivity(list) {
+            const container = document.getElementById('recentActivity');
+            if(list.length === 0) {
+                container.innerHTML = `<div class="empty-state"><p>No recent activity.</p></div>`;
+                return;
+            }
+            container.innerHTML = list.map(a => {
+                let msg = `Scheduled ${a.service || 'Service'}`;
+                if(a.status === 'completed') msg = `Completed ${a.service || 'Service'}`;
+                if(a.status === 'cancelled') msg = `Cancelled ${a.service || 'Service'}`;
+                return `
+                <div style="background:var(--white); padding:15px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:10px; display:flex; gap:10px; align-items:center;">
+                    <div style="width:40px; height:40px; background:#f8f9fa; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--primary-gold);">
+                        <i class="fas ${a.status === 'completed' ? 'fa-check' : 'fa-history'}"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.9rem; font-weight:600; color:var(--text-dark);">${msg}</div>
+                        <div style="font-size:0.75rem; color:var(--text-grey);">${formatDate(a)}</div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if(user) {
+                currentUser = user;
+                updateWelcome(user);
+                loadDashboard();
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // Offline Check
+        window.addEventListener('offline', () => document.getElementById('offlineBadge').classList.add('show'));
+        window.addEventListener('online', () => document.getElementById('offlineBadge').classList.remove('show'));
+
+        // Scroll Header
+        let lastScroll = 0;
+        const header = document.getElementById('header');
+        const nav = document.querySelector('.bottom-nav');
+        window.addEventListener('scroll', () => {
+            let current = window.pageYOffset;
+            if (current > lastScroll && current > 100) {
+                header.classList.add('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(100px)';
+            } else {
+                header.classList.remove('hidden');
+                if(nav) nav.style.transform = 'translateX(-50%) translateY(0)';
+            }
+            lastScroll = current <= 0 ? 0 : current;
+        });
+    </script>
+
+    <!-- PWA Init -->
+    <script src="/js/pwa-init.js"></script>
+    <script src="analytics.js"></script>
+    <script src="service-worker-manager.js"></script>
+</body>
+</html>
